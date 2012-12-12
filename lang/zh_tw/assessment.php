@@ -1,0 +1,304 @@
+<?php
+defined('MOODLE_INTERNAL') || die();
+
+$string['assessment'] = '評估';
+$string['modulename'] = '評估';
+$string['modulenameplural'] = '評估';
+$string['pluginname'] = '評估';
+$string['pluginadministration'] = '評估管理';
+
+$string['assessmentfieldset'] = '評估類別';
+$string['assessmentintro'] = '評估簡介';
+$string['assessmentname'] = '評估名稱';
+
+$string['teacher'] = '老師';
+$string['self'] = '自己';
+$string['peer'] = '同儕';
+
+$string['teacherassessment'] = '師評';
+$string['selfassessment'] = '自評';
+$string['peerassessment'] = '互評';
+
+$string['periodnotstarted'] = ' 時段未開始';
+$string['ongoing'] = ' 進行中';
+$string['periodended'] = ' 時段完結';
+$string['unlimitedperiod'] = ' 時段並無限制';
+$string['graded'] = '已評分';
+$string['notgraded'] = '未評分';
+$string['allgraded'] = '全部已評分';
+$string['stillgrading'] = '評分中';
+$string['published'] = '已發佈';
+$string['notpublished'] = '未發佈';
+$string['commented'] = '已留評語';
+$string['nocomment'] = '未留評語';
+
+$string['weight'] = '比重';
+$string['forum'] = '討論';
+$string['start'] = '開始';
+$string['end'] = '完結';
+$string['submitstart'] = '開始呈交';
+$string['submitend'] = '結束呈交';
+$string['publish'] = '發佈';
+$string['noofpeertoassess'] = '互評的同儕數目';
+$string['noofgrouptoassess'] = '互評的小組數目';
+
+$string['rubrictitle'] = '評量準則名稱';
+$string['loadrubric'] = '選擇評量準則';
+$string['singlegrade'] = '沒有: 用單一評分';
+$string['createnewrubric'] = '[ 建立新的評量準則 ... ]';
+$string['importrubric'] = '[ 複製/匯入 評量準則 ... ]';
+$string['viewrubriclist'] = '[ 更新/複製 評量準則 ... ]';
+$string['norubrics'] = '此課程沒有已儲存的評量準則';
+$string['howtoselectrubric'] = '怎樣選擇一個適合的評量準則';
+$string['rubric'] = '評量準則';
+$string['rubricrowspecs'] = '評量準則橫行的設定';
+$string['rubriccolspecs'] = '評量準則直行的設定';
+$string['rubricspecs'] = '評量準則格的設定';
+$string['viewrubrics'] = '觀看評量準則';
+$string['points'] = '分';
+$string['createrubric'] = '新增一個評量準則';
+$string['copyrubric'] = '選擇一個評量準則來複製 ...';
+
+$string['operations'] = 'Operations';
+$string['inuse'] = '使用中';
+$string['points'] = '分';
+$string['createdby'] = '建立者';
+$string['creationdate'] = '建立';
+$string['delete'] = '刪除';
+$string['rubrics'] = '評量準則';
+$string['nodelete'] = '請先移除或更改與這評量準側有關的所有評估活動。';
+$string['loadconfig'] = '載入設定';
+$string['maxsize'] = '設定檔最大檔案大小';
+$string['configuploaderror'] = '在載入設定檔時發生了錯誤。';
+$string['create'] = '建立';
+$string['update'] = '更新';
+$string['name'] = '名稱';
+$string['options'] = '選項';
+$string['total'] = '總分';
+
+$string['defaultforumname'] = '討論: ';
+
+$string['noofrows'] = '準則數目';
+$string['noofcols'] = '評級數目';
+$string['rowcoldefine'] = '行/列定義';
+$string['rowcol1'] = '行：準則，列：評級';
+$string['rowcol2'] = '行：評級，列：準則';
+$string['haverange'] = '有範圍';
+$string['totalmark'] = '總分';
+$string['maxmark'] = '最高分';
+
+$string['clicktoview'] = '點擊閱覽';
+$string['clicktoupdate'] = '點擊更新';
+$string['work'] = '的作品';
+$string['yourwork'] = '你的作品';
+$string['discussiononyourwork'] = '作品的討論';
+$string['discussion'] = '討論';
+$string['notavailable'] = '未有';
+$string['comment'] = '評語';
+$string['emptyweight'] = '比重不可留空';
+$string['invalidweight'] = '比重需介乎0至1之間';
+$string['invalidtotalweight'] = '全部比重的總和需等如1';
+$string['endearlythanstart'] = '完結日期不能比開始日期更早';
+$string['publishearlythanstart'] = '發佈日期不能比開始日期更早';
+$string['modinstancenotselected'] = '必需選擇一個活動與評估連結';
+$string['youtopeers'] = '你向同儕';
+$string['peerstoyou'] = '同儕向你';
+$string['choosepeertograde'] = '選擇一位同儕評分...';
+$string['showrubric'] = '顯示評量準則';
+$string['hiderubric'] = '隱藏評量準則';
+$string['topeers'] = '給予同儕';
+$string['bypeers'] = '來自同儕';
+$string['marker'] = '評分者';
+$string['markby'] = '被評者';
+$string['grade'] = '評級';
+$string['grades'] = '評級';
+$string['gradespecs'] = '評級定義';
+$string['discussionintro'] = '請在這裡討論 studentname 的作品';
+$string['pleasereply'] = '請回覆以發表你的意見';
+$string['unreadpost'] = '未讀留言';
+
+$string['mode'] = '模式';
+$string['mode_student_assess_sample'] = '同學評價範例';
+$string['mode_normal'] = '三種評分的組合';
+$string['submissionfilesnum'] = '需呈交的檔案數量';
+$string['attachment'] = '附件';
+$string['uploadingoffiles'] = '上載檔案';
+$string['filesrequired'] = '個檔案需要上載';
+$string['title'] = '標題';
+$string['notitle'] = '沒有標題';
+$string['updatesubmission'] = '更新你的呈交內容';
+$string['uploadsuccess'] = '檔案已成功上載';
+$string['submitted'] = '已呈交';
+$string['notsubmitted'] = '未呈交';
+$string['submitfail'] = '有錯誤發生，你的作品並未呈交/更新';
+$string['filessubmitted'] = ' 個檔案已經呈交';
+$string['nofilesuploaded'] = '尚未上載任何檔案';
+$string['numfileserror'] = '錯誤: 檔案總數不等如';
+$string['viewsubmissionof'] = '檢視作品 ';
+$string['filesuploaded'] = '已上載檔案';
+$string['latesubmission'] = '遲交';
+$string['submissiondate'] = '呈交日期';
+$string['submissionsummary'] = '呈交情況概覽';
+
+$string['teachergraded'] = '已師評';
+$string['teachernotgraded'] = '未師評';
+$string['selfgraded'] = '已自評';
+$string['selfnotgraded'] = '未自評';
+$string['peergraded'] = '已互評';
+$string['peernotgraded'] = '未互評';
+$string['showall'] = '顯示全部';
+$string['lastmodified'] = '最後更改';
+$string['feedback'] = '回應';
+$string['finalgrade'] = '總分';
+$string['custompoint'] = '分數不同?';
+$string['pts'] = '分';
+$string['to'] = '至';
+$string['save'] = '儲存';
+$string['file'] = '檔案';
+$string['link'] = '連結';
+$string['errorinvalidurl'] = '錯誤: 不正確的連結 $a';
+$string['erroremptyurl'] = '錯誤: 有連結欄漏空';
+$string['submission'] = '遞交';
+$string['submissions'] = '遞交';
+$string['noactivity'] = '沒有活動可作評估';
+$string['nodescription'] = '<em>未有輸入描述</em>';
+$string['assessmentitems'] = '所有評估種類的總數';
+$string['peergradedall'] = '已互評所有';
+$string['peergradedsome'] = '已互評部份';
+$string['peergradednone'] = '未作互評';
+$string['notset'] = '沒有定立';
+$string['notapplicable'] = '不適用';
+$string['nobackupfilesfound'] = '沒有找到備份檔案';
+$string['filesbackup'] = '已備份的舊檔案';
+$string['peergroupmode'] = '群組互評模式';
+$string['studenttostudent'] = '學生 評 學生';
+$string['studenttogroup'] = '學生 評 群組';
+$string['grouptogroup'] = '群組 評 群組';
+$string['nogroup_invalidworkmode'] = '群組模式是「沒有任何群組」時，作業形式不能是「群組」';
+$string['nogroup_invalidpeergroupmode'] = '群組模式是「沒有任何群組」時，不能選擇評估群組';
+$string['separategroup_invalidpeergroupmode'] = '群組模式是「分割群組」時，不能選擇評估群組';
+$string['visiblegroup_invalidpeergroupmode1'] = '作業模式是「個人」時，不能選擇評估群組';
+$string['visiblegroup_invalidpeergroupmode2'] = '作業模式是「群組」時，不能選擇評估學生';
+$string['workmode'] = '學生作業形式';
+$string['individualwork'] = '個人';
+$string['groupwork'] = '群組';
+$string['fullname'] = '學生全名';
+$string['groupname'] = '群組名稱';
+$string['activitytype'] = '活動種類';
+$string['saveandclose'] = '儲存並關閉';
+$string['close'] = '關閉';
+$string['rubric_cannotfinduser'] = '建立評量準則時發生錯誤: 找不到用戶';
+$string['rubric_invalidcourse'] = '建立評量準則時發生錯誤: 不正確的課程';
+$string['rubric_notitle'] = '評量準則必需要有名稱';
+$string['rubric_colnotitle'] = '全部列必需要有名稱';
+$string['rubric_colnopoint'] = '全部列必需要有相對的分數';
+$string['rubric_colpointorder'] = '列的分數，必需要是由左至右一路遞增';
+$string['rubric_colpointupperrange'] = '設定有範圍的分數，上限必需大過下限';
+$string['rubric_colpointlowerrange'] = '列的分數下限，必需大過左方列的分數上限';
+$string['rubric_rownotitle'] = '全部行必需要有名稱';
+
+$string['noviewdiscussionspermission'] = '你沒有權限檢視這個評估活動的討論。';
+$string['discussionlist'] = '討論主題列表';
+
+$string['viewallrubrics'] = '正在檢視平台內所有評估量表';
+$string['viewcourserubrics'] = '正在檢視本課程內的評估量表: ';
+$string['changeallrubrics'] = '檢視平台內所有評估量表';
+$string['changecourserubrics'] = '只檢視課程內的評估量表';
+
+$string['mingrade'] = '最低';
+$string['maxgrade'] = '最高';
+$string['notused'] = '<em>不適用</em>';
+$string['rubricformattips'] = '提示：用「[ ]」包著文字可將它變為<span style=\'background-color:greenyellow;\'>高亮</span>，用「{ }」包著則可變為<strong>粗體</strong>。';
+$string['rubricformattips'] = '提示： 
+<ol>
+<li>在評估準則的描述文字框內輸入\'NA\'來停用該程度；</li>
+<li>用 [ ] 包著文字可將它變為<span style=\'background-color:greenyellow;\'>高亮</span>；</li>
+<li>用 { } 包著則可變為<strong>粗體</strong>。</li>
+</ol>';
+$string['rubricinusebyass'] = '這個評量準則已被用來在評估活動內評分，所以不能再更改。';
+$string['rubricinusebyassandsass'] = '這個評量準則已被用來在評估或範例評估活動內評分，所以不能再更改。';
+$string['rubriccannotedit'] = '<div style="width:80%;text-align:center;margin-left:auto;margin-right:auto">
+<p>當評估量表被任何一個評估活動用來評分後，便不能夠隨便刪除。如果你一定要刪除這個評估量表，你必須先刪除這個評估活動：</p></div>$a<br />';
+$string['downloadall'] = '下載所有已呈交檔案';
+$string['createrubricexist'] = '由一個已存在的評估量表建立一個新的：';
+$string['addrubric'] = '新增評估量表到課程';
+$string['class'] = '班別';
+$string['classno'] = '班號';
+$string['timemodified'] = 'Time modified';
+$string['usedby'] = '被使用';
+$string['submittedsymbol'] = '*** 表示已逞交功課';
+
+// capabilities
+$string['assessment:deleteanypost'] = '刪除任何帖子';
+$string['assessment:deleteownpost'] = '刪除自己的帖子';
+$string['assessment:grade'] = '評分';
+$string['assessment:peergrade'] = '互評';
+$string['assessment:replypost'] = '回覆帖子';
+$string['assessment:selfgrade'] = '自評';
+$string['assessment:submit'] = '遞交作品供評估';
+$string['assessment:teachergrade'] = '以老師身份評分';
+$string['assessment:teacherview'] = '以老師身份檢視';
+$string['assessment:upload'] = '上載檔案供評估';
+$string['assessment:view'] = '檢視';
+$string['assessment:viewdiscussion'] = '檢視討論';
+
+// errors messages
+$string['invalidid'] = '不正確的assessment ID';
+$string['coursemisconf'] = '課程設定錯誤';
+$string['invaliddiscussionid'] = "不正確或已經不存在的discussion ID";
+$string['discussionnotexist'] = '該主題已經不存在';
+$string['cannotviewpost'] = '你沒有權限檢視這個帖子';
+$string['notrequirefile'] = '這個評估活動不需要上載檔案。';
+$string['nosubmission'] = '找不到任何遞交了的檔案，所以未能下載。';
+$string['cannotcreatetempfolder'] = '建立暫存資料夾時發生錯誤，ZIP檔案沒有被建立。';
+$string['cannotcreateuserfolder'] = '建立用戶資料夾({$a})時發生錯誤，ZIP檔案沒有被建立。';
+$string['cannotcopyfile'] = '複製用戶檔案({$a})時發生錯誤，ZIP檔案沒有被建立。';
+$string['cannotcreatezipfile'] = '不能建立ZIP檔案。';
+$string['incorrectparentpostid'] = '不正確的Parent post ID。';
+$string['postnotdiscussion'] = '這個帖了並不是討論串的一部份。';
+$string['incorrectpostid'] = '不正確的Post ID。';
+$string['cannoteditotherpost'] = '你不能編輯其他人的帖子！';
+$string['cannotdeletepost'] = '你不能刪除這個帖子！';
+$string['cannotupdatepost'] = '你不能更新這個帖子！';
+$string['errordeletingpost'] = '刪除數據時發生了錯誤：{$a}';
+$string['nooperationspecified'] = '沒有指定程序。';
+$string['notfindtopparent'] = '找不到屬於這個帖子討論串的最頂層: {$a}';
+$string['cannotreplypost'] = '你不能回覆這個帖子。';
+$string['notpartofdiscussion'] = '這個帖子並不是討論串的一部份。';
+$string['failupdatesubmission'] = '評估遞交：更新遞交記錄失敗！';
+$string['errorbackup'] = '備份檔案時發生錯誤：{$a}';
+$string['errordelete'] = '刪除檔案時發生錯誤：{$a}';
+$string['failcreatesubmission'] = '評估遞交：新增遞交記錄失敗！';
+$string['errordeleterubric'] = '刪除評估量表時發生錯誤：{$a}';
+$string['cidmismatchrid'] = 'Course ID和Rubric ID不匹配。';
+$string['cannotgetrubricrecord'] = '找不到該評估量表：{$a}';
+$string['noaction'] = '沒有指供參數 "action" 的值。';
+$string['invalidgrade'] = '存存評估量表資料時發生錯誤。不正確的評分 (graded={$a->is_graded} assid={$a->aid} rubricid={$a->rid})。';
+$string['scriptnotfound'] = '找不到Script檔案 \'{$a}\'，頁面不能正常運作。';
+$string['errorinsertgradespec'] = '新增評分項目時發生錯誤。';
+$string['specobjectarray'] = '項目必需要是<i>物件</i>(推薦)或<i>陣列</i>.';
+$string['duplicaterubricname'] = '只一個同樣名為 \'$a\' 的評估量表已經存在，請選擇另一個名稱。';
+$string['errorcreaterubric'] = '新增評估量表時時發生錯誤。';
+$string['erroradddiscussion'] = '不能加入討論串到論壇';
+$string['errormodifydiscussionauthor'] = '不能更改討論串的作者';
+$string['errormodifypostauthor'] = '不能更改帖子的作者';
+$string['errorgetteacherassessment'] = '找不到有師評';
+$string['errorgetselfassessment'] = '找不到有自評';
+$string['erroradddiscussion'] = '不能新增討論主題到這個論壇';
+$string['errormodifyauthor'] = '不能更改討論主題的作者';
+$string['errormodifyauthorpost'] = '不能更改帖子的作者';
+$string['errorprocessgrade'] = '不能處理評估的評分';
+$string['errorinsertgrade'] = '不能新增這次評估的評分';
+$string['errorwrongparams'] = '提供了錯誤的參數，請從一個正確的連結來開啟這頁';
+$string['errornopeerassessed'] = '你尚未評估任何同儕，沒有詳情可以顯示。';
+$string['errorpeerpublishdate'] = '未能檢視評估：尚未到達互評的發佈日期。';
+$string['errornomarker'] = '沒有這位評分者！';
+$string['errornouser'] = '沒有這位用戶！';
+$string['errornogroup'] = '沒有這個群組！';
+$string['errorpeermaxed'] = '{$a} 位同儕已被評估，已到到指定數量。';
+$string['errorcannotviewcontent'] = '你沒有權限檢視這內容。';
+$string['errorincorrectcmid'] = '不正確的Course Module ID。';
+$string['errornouseridgroupid'] = '沒有提供 userid 或 groupid。';
+$string['errornopeerassessment'] = '沒有互評的設定。';
+
+?>

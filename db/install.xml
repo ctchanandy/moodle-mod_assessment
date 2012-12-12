@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/assessment/db" VERSION="20120403" COMMENT="XMLDB file for Moodle mod/assessment"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="assessment" COMMENT="Default comment for assessment, please edit me" NEXT="assessment_types">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course assessment activity belongs to" PREVIOUS="id" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="course" NEXT="rubricid"/>
+        <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="grade" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="rubricid" NEXT="intro"/>
+        <FIELD NAME="intro" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the assessment activity" PREVIOUS="name" NEXT="introformat"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="intro" NEXT="forum"/>
+        <FIELD NAME="forum" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="introformat" NEXT="numfiles"/>
+        <FIELD NAME="numfiles" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="forum" NEXT="workmode"/>
+        <FIELD NAME="workmode" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="numfiles" NEXT="submitstart"/>
+        <FIELD NAME="submitstart" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="workmode" NEXT="submitend"/>
+        <FIELD NAME="submitend" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="submitstart" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="submitend"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="rubricid"/>
+        <KEY NAME="rubricid" TYPE="foreign" FIELDS="rubricid" REFTABLE="assessment_rubrics" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assessment_types" COMMENT="assessment_types table" PREVIOUS="assessment" NEXT="assessment_grades">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assessmentid"/>
+        <FIELD NAME="assessmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="assessmentid" PREVIOUS="id" NEXT="type"/>
+        <FIELD NAME="type" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="0=teacher; 1=self; 2=peer." PREVIOUS="assessmentid" NEXT="timestart"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="type" NEXT="timeend"/>
+        <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timestart" NEXT="timepublish"/>
+        <FIELD NAME="timepublish" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timeend" NEXT="weight"/>
+        <FIELD NAME="weight" TYPE="number" LENGTH="6" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5" PREVIOUS="timepublish" NEXT="peernum"/>
+        <FIELD NAME="peernum" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="weight" NEXT="peergroupmode"/>
+        <FIELD NAME="peergroupmode" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="peernum"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="assessmentid" UNIQUE="false" FIELDS="assessmentid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assessment_grades" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_types" NEXT="assessment_rubrics">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assessmentid"/>
+        <FIELD NAME="assessmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="assessmentid" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="marker"/>
+        <FIELD NAME="marker" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="groupid" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="marker" NEXT="type"/>
+        <FIELD NAME="type" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="grade" NEXT="comment"/>
+        <FIELD NAME="comment" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="type" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="comment"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_assgrad_use_ix" UNIQUE="false" FIELDS="userid" NEXT="mdl_assgrad_ass_ix"/>
+        <INDEX NAME="mdl_assgrad_ass_ix" UNIQUE="false" FIELDS="assessmentid" PREVIOUS="mdl_assgrad_use_ix" NEXT="mdl_assgrad_mar_ix"/>
+        <INDEX NAME="mdl_assgrad_mar_ix" UNIQUE="false" FIELDS="marker" PREVIOUS="mdl_assgrad_ass_ix"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assessment_rubrics" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_grades" NEXT="assessment_rubric_row_specs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="creatorid"/>
+        <FIELD NAME="creatorid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="description" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="creatorid" NEXT="points"/>
+        <FIELD NAME="points" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="rowcoldefine"/>
+        <FIELD NAME="rowcoldefine" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="points" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rowcoldefine"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_rubric_row_specs" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_rubrics" NEXT="assessment_rubric_col_specs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="rubricid"/>
+        <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="displayorder"/>
+        <FIELD NAME="displayorder" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rubricid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="displayorder" NEXT="custompoint"/>
+        <FIELD NAME="custompoint" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Customize the point for this row? 0 is no, 1 is yes" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="rubricid"/>
+        <KEY NAME="rubricid" TYPE="foreign" FIELDS="rubricid" REFTABLE="assessment_rubrics" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_rubric_col_specs" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_rubric_row_specs" NEXT="assessment_rubric_specs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="rubricid"/>
+        <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="displayorder"/>
+        <FIELD NAME="displayorder" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rubricid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="displayorder" NEXT="points"/>
+        <FIELD NAME="points" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="name" NEXT="maxpoints"/>
+        <FIELD NAME="maxpoints" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="points"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="rubricid"/>
+        <KEY NAME="rubricid" TYPE="foreign" FIELDS="rubricid" REFTABLE="assessment_rubrics" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_rubric_specs" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_rubric_col_specs" NEXT="assessment_grade_specs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="rubricrowid"/>
+        <FIELD NAME="rubricrowid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="rubriccolid"/>
+        <FIELD NAME="rubriccolid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rubricrowid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="rubriccolid" NEXT="points"/>
+        <FIELD NAME="points" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="description" NEXT="maxpoints"/>
+        <FIELD NAME="maxpoints" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="points"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="rubricrowid"/>
+        <KEY NAME="rubricrowid" TYPE="foreign" FIELDS="rubricrowid" REFTABLE="assessment_rubric_row_specs" REFFIELDS="id" PREVIOUS="primary" NEXT="rubriccolid"/>
+        <KEY NAME="rubriccolid" TYPE="foreign" FIELDS="rubriccolid" REFTABLE="assessment_rubric_col_specs" REFFIELDS="id" PREVIOUS="rubricrowid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_grade_specs" COMMENT="Default comment for the table, please edit me" PREVIOUS="assessment_rubric_specs" NEXT="assessment_submissions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="gradeid"/>
+        <FIELD NAME="gradeid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="rubricspecid"/>
+        <FIELD NAME="rubricspecid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="gradeid" NEXT="value"/>
+        <FIELD NAME="value" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="rubricspecid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" PREVIOUS="value"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="gradeid"/>
+        <KEY NAME="gradeid" TYPE="foreign" FIELDS="gradeid" REFTABLE="assessment_grades" REFFIELDS="id" PREVIOUS="primary" NEXT="rubricspecid"/>
+        <KEY NAME="rubricspecid" TYPE="foreign" FIELDS="rubricspecid" REFTABLE="assessment_rubric_specs" REFFIELDS="id" PREVIOUS="gradeid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_submissions" COMMENT="Default comment for the table" PREVIOUS="assessment_grade_specs" NEXT="assessment_discussions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assessmentid"/>
+        <FIELD NAME="assessmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="assessmentid" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="title"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="groupid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="title" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="description" NEXT="late"/>
+        <FIELD NAME="late" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="url"/>
+        <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="late"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assessment_assessment_submissions"/>
+        <KEY NAME="assessment_assessment_submissions" TYPE="foreign" FIELDS="assessmentid" REFTABLE="assessment" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assessment_discussions" COMMENT="Table for storing discussion in assessment activity" PREVIOUS="assessment_submissions" NEXT="assessment_posts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assessmentid"/>
+        <FIELD NAME="assessmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="assessmentid" NEXT="firstpost"/>
+        <FIELD NAME="firstpost" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="name" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstpost" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="-1" SEQUENCE="false" PREVIOUS="userid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="groupid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assessmentid"/>
+        <KEY NAME="assessmentid" TYPE="foreign" FIELDS="assessmentid" REFTABLE="assessment" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assessment_posts" COMMENT="Table for storing discussion post in assessment activity" PREVIOUS="assessment_discussions" NEXT="assessment_read">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="discussionid"/>
+        <FIELD NAME="discussionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="parent"/>
+        <FIELD NAME="parent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="discussionid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="parent" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="subject"/>
+        <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="timemodified" NEXT="message"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="subject" NEXT="format"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="message"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="discussionid"/>
+        <KEY NAME="discussionid" TYPE="foreign" FIELDS="discussionid" REFTABLE="assessment_discussions" REFFIELDS="id" PREVIOUS="primary" NEXT="parent"/>
+        <KEY NAME="parent" TYPE="foreign" FIELDS="parent" REFTABLE="assessment_posts" REFFIELDS="id" PREVIOUS="discussionid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" NEXT="timecreated"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated" PREVIOUS="userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assessment_read" COMMENT="Table for storing assessment post read history" PREVIOUS="assessment_posts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="assessmentid"/>
+        <FIELD NAME="assessmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="discussionid"/>
+        <FIELD NAME="discussionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="assessmentid" NEXT="postid"/>
+        <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="discussionid" NEXT="firstread"/>
+        <FIELD NAME="firstread" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="postid" NEXT="lastread"/>
+        <FIELD NAME="lastread" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="firstread"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid-assessmentid" UNIQUE="false" FIELDS="userid, assessmentid" NEXT="userid-discussionid"/>
+        <INDEX NAME="userid-discussionid" UNIQUE="false" FIELDS="userid, discussionid" PREVIOUS="userid-assessmentid" NEXT="userid-postid"/>
+        <INDEX NAME="userid-postid" UNIQUE="false" FIELDS="userid, postid" PREVIOUS="userid-discussionid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

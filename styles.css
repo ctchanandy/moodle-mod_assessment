@@ -1,0 +1,437 @@
+#mod-assessment-view .feedback .content,
+#mod-assessment-view .feedback .topic,
+#mod-assessment-view .feedback .picture
+{
+  padding: 10px;
+  border-width:1px;
+  border-style:solid;
+  border-color:#DDDDDD;
+}
+
+#mod-assessment-view form#options div {
+  text-align:right;
+  margin-left:auto;
+  margin-right:20px;
+}
+
+.mod-assessment .feedback .files {
+  float: right;
+  background-color: #EFEFEF;
+  padding:5px;
+}
+
+.mod-assessment .feedback .grade,
+.mod-assessment .feedback .outcome,
+.mod-assessment .feedback .finalgrade,
+.mod-assessment .feedback .forum {
+  float: right;
+}
+
+.mod-assessment .feedback .disabledfeedback {
+  width: 500px;
+  height: 250px;
+}
+
+.mod-assessment .feedback .from {
+  float: left;
+}
+
+.mod-assessment .feedback .time {
+  font-size: 0.8em;
+}
+
+.mod-assessment .late {
+  color: red;
+}
+
+.mod-assessment .files img {
+  margin-right: 4px;
+}
+
+.mod-assignment .files a {
+  white-space:nowrap;
+}
+
+#mod-assessment-view .generaltable .r1 {
+  background-color: #FFFFFF;
+}
+
+#mod-assessment-view .header .commands {
+  display: inline;
+}
+
+#mod-assessment-view .s0 {
+  background: #FFD991;
+}
+
+#mod-assessment-view table.assessment_grades td,
+#mod-assessment-view table.assessment_grades th
+{
+  border-width: 1px;
+  border-style: solid;
+  border-color: #DDDDDD;
+  vertical-align: middle;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mod-assessment-view th.assessment_grades th.grade {
+  text-align: right;
+  font-weight: bold;
+}
+
+#mod-assessment-view td.assessment_grades td.grade {
+  text-align: right;
+  font-weight: normal;
+}
+
+#mod-assessment-view .picture {
+  width: 35px;
+}
+
+#mod-assessment-view .fullname {
+  text-align: left;
+}
+
+#mod-assessment-view .timemodified,
+#mod-assessment-view .timemarked
+{
+  text-align: left;
+  font-size: 0.9em;
+}
+
+#mod-assessment-view .status {
+  text-align: center;
+}
+
+#mod-assessment-view .assessment_grades .outcome,
+#mod-assessment-view .assessment_grades .finalgrade {
+  text-align: right;
+}
+
+#mod-assessment-view #online .singlebutton {
+  text-align: center;
+}
+
+#mod-assessment-view #dates {
+  font-size: 1em;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#mod-assessment-view #dates .c0{
+   width: 8%;
+   text-align: center;
+   font-weight: bold;
+}
+
+#mod-assessment-view #dates .c1{
+   width: 16%;
+   text-align: left;
+   font-weight: bold;
+}
+
+#viewdatetable {
+   width: 100%;
+}
+
+#mod-assessment-view #studentviewdiv {
+   width: 95%;
+}
+
+#mod-assessment-view .feedback {
+  border-width:1px;
+  border-style:solid;
+  border-color:#DDDDDD;
+  margin-top: 15px;
+  width: 80%;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+#mod-assessment-view .feedback .topic {
+  padding: 4px;
+  border-style:solid;
+  border-width: 0px;
+  border-bottom-width: 1px;
+  border-color:#DDDDDD;
+}
+
+#mod-assessment-view .feedback .fullname {
+  font-weight: bold;
+}
+
+#mod-assessment-view .feedback .date {
+  font-size: 0.8em;
+}
+
+#mod-assessment-view .feedback .content {
+  padding: 4px;
+}
+
+#mod-assessment-view .feedback .grade {
+  text-align: right;
+  font-weight:bold;
+}
+
+#mod-assessment-view .feedback .left {
+  width: 35px;
+  padding: 4px;
+  text-align: center;
+  vertical-align: top;
+}
+
+#mod-assessment-view .qgprefs #optiontable {
+  text-align:right;
+  margin-left:auto;
+}
+
+#mod-assessment-view .fgcontrols {
+  margin-top: 1em;
+  text-align:center;
+}
+
+#mod-assessment-view .fgcontrols .fastgbutton{
+  margin-top: 0.5em;
+}
+
+#mod-assessment-activitydetailtable {
+   font-size: 1.0em;
+}
+
+#mod-assessment-activitydetailtable th {
+   width:18%;
+   font-size: 1.0em;
+   font-weight:bold;
+   text-align:right;
+   vertical-align:top;
+}
+
+#mod-assessment-activitydetailtable th.assessmentheader {
+   font-size: 1.3em;
+   text-align: left;
+   color: #0066FF;
+   border-bottom: 1px solid #0066FF;
+}
+
+.studentviewtable {
+   font-size: 1.0em;
+}
+
+.studentviewtable th {
+   width:18%;
+   font-size: 1.0em;
+   font-weight:bold;
+   text-align:center;
+   vertical-align:top;
+}
+
+.studentviewtable th.assessmentheader {
+   font-size: 1.3em;
+   text-align: left;
+   color: #0066FF;
+   border-bottom: 1px solid #0066FF;
+}
+
+#mod-assessment-peermarked th {
+   width:auto;
+   font-size: 1.0em;
+   font-weight:bold;
+   text-align:left;
+   vertical-align:top;
+}
+
+#mod-assessment-peermarked .count {
+   width:15px;
+   padding-right:5px;
+}
+
+#submissionsummarytable {
+   font-size: 1.0em;
+}
+
+#submissionsummarytable th {
+   width:20%;
+   font-size: 0.8em;
+   font-weight:bold;
+   text-align:right;
+   vertical-align:top;
+}
+
+#submissionsummarytable td {
+   font-size: 0.8em;
+   vertical-align:top;
+}
+
+div.submissionsummary {
+   padding: 5px;
+   padding-bottom: 25px;
+}
+
+div.submissionsummary div {
+	float:left;
+	height: 25px;
+	width: 200px;
+	padding-left: 38px;
+}
+
+.activefilter {
+background: yellow;
+}
+
+div#intro h3 {
+    margin-top:0px;
+    margin-bottom:5px;
+}
+
+div#datecalendar {
+    font-size: 0.8em;
+}
+
+div#datecalendar td {
+    padding: 0px;
+}
+
+.fullname {
+    font-size: 0.9em;
+}
+
+div#summary_table {
+    margin-top: 15px;
+}
+
+/* CSS for rubric */
+#rubric td.shadebg {
+    background-color: #E1E8EA;
+}
+#rubric .percent {
+    padding-left:15px;
+}
+#rubric {
+    width: 100%;
+    font-size: 1em;
+    border-color: #AAA;
+}
+#rubric th, #rubric td {
+    vertical-align: top;
+    font-size: 1em;
+    border-color: #AAA;
+    padding: 2px;
+}
+#rubric td.line {
+    border-top: 1px solid grey;
+    font-weight: bold;
+    font-size: 1em;
+}
+#rubric td.name {
+    color: grey;
+    font-size: 1pt;
+    font-style: italic;
+}
+#rubric tr.colored {
+    background-color: #e1e8ea;
+}
+#rubric tr.nocolor {
+    background-color: none;
+}
+
+.custom_point_div {
+    width:100%;
+    border-bottom: 1px solid #AAA;
+    text-align:center;
+    font-weight:bold;
+}
+
+.rbtablediv {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#rbtable, #rbtable td {
+    border-color: #AAA;
+    border-style: solid;
+}
+
+#rbtable {
+    font-size: 1em;
+    border-width: 0 0 1px 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+#rbtable td {
+    margin: 0;
+    padding-left: 14px;
+    border-width: 1px 1px 0 0;
+    background-color: #DDD;
+}
+
+#rbtable td.clickrubriccell {
+    
+}
+
+/* Other styles */
+#mform1 {width: 100%;}
+input.colname, input.rowname {
+    font-size: 8pt;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+
+textarea.celldesc {
+    height: 125px;
+    min-width: 150px;
+    font-size: 8pt;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    overflow-y: auto;
+}
+
+span.linktoupload a {
+    color: red;
+}
+
+span.linktoupload a:hover {
+    font-weight: bold;
+}
+
+span.notavailable_span {
+    color: red;
+}
+
+.mod-assessment div.indent {
+    margin-left: 30px;
+}
+
+td.boldformlabel {
+    font-weight: bold;
+}
+
+#page-mod-assessment-view h2.teacherviewheading {
+    text-align: left;
+    margin: 0.5em 0;
+    margin-top: 0.25em;
+}
+
+.textaligncenter {
+    text-align: center;
+}
+
+div#div_grandtotal {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+span.submittedlink {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+ol.peersummary li {
+    margin-bottom: 5px;
+    border-bottom: 1px solid #DDD;
+}
+
+ol.peersummary li div {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
