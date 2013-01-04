@@ -17,11 +17,11 @@
 /**
  * assessment instance add/edit form
  *
- * @package    mod
- * @subpackage assessment
- * @author ekpenso.com
- * @copyright  2012 Andy Chan <ctchan.andy@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod
+ * @subpackage  assessment
+ * @author      Andy Chan, CITE, HKU <ctchan.andy@gmail.com>
+ * @copyright   2012 Andy Chan <ctchan.andy@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
