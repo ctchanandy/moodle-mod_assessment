@@ -1419,7 +1419,7 @@ class assessment_base {
                     if ($workmode == 'group') {
                         $select = "SELECT g.id,
                                        ags.id, ags.groupid, ags.marker, 
-                                       ags.grade, ags.type, ags.timemodified, ags.comment";
+                                       ags.grade, ags.type, ags.timemodified, ags.comment ";
                         $sql = "FROM {groups} g 
                                 LEFT JOIN {assessment_grades} ags ON g.id = ags.groupid
                                 AND ags.type = ? AND ags.assessmentid =  
@@ -3200,12 +3200,15 @@ function assessment_get_user_grades($assessment, $userid=0) {
                 $usersql GROUP BY u.id";
     $users_graded = array_keys($DB->get_records_sql($sql));
     
-    $sql = "SELECT u.id, s.comment AS feedback, s.marker AS usermodified
-            FROM {user} u, {assessment_grades} s
-            WHERE u.id = s.userid AND s.assessmentid = ".$assessment->teacher."
-                AND type = 0 $usersql";
-    
-    $teacher_comment = $DB->get_records_sql($sql);
+    $teacher_comment = '';
+    if (isset($assessment->teacher)) {
+        $sql = "SELECT u.id, s.comment AS feedback, s.marker AS usermodified
+                FROM {user} u, {assessment_grades} s
+                WHERE u.id = s.userid AND s.assessmentid = ".$assessment->teacher."
+                    AND type = 0 $usersql";
+        
+        $teacher_comment = $DB->get_records_sql($sql);
+    }
     
     $gradearr = array();
     if (!empty($users_graded)) {

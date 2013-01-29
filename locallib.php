@@ -94,6 +94,8 @@ function assessment_print_url($url, $submissionid, $count, $return=NULL, $edit=1
     return $html;
 }
 
+// This seems to be a bad function since it doesn't properly validate https URL
+/*
 function is_valid_url($url) {
     $url = @parse_url($url);
     if (!$url) {return false;}
@@ -118,6 +120,11 @@ function is_valid_url($url) {
         return (bool) preg_match('#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers);
     }
     return false;
+}
+*/
+function is_valid_url($url) {
+    $v = "/^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i";
+    return (bool)preg_match($v, $url);
 }
 
 function assessment_print_file($file, $sid, $context, $type='html', $edit=1) {
