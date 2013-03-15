@@ -79,7 +79,9 @@ function assessment_update_grades($assessment=null, $userid=0, $courseid=0) {
 function assessment_print_url($url, $submissionid, $count, $return=NULL, $edit=1) {
     global $CFG, $OUTPUT;
     
-    $image = html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('f/web'), 'class'=>'icon'));
+    $pix = $OUTPUT->pix_url('f/web') ? $OUTPUT->pix_url('f/web') : $OUTPUT->pix_url('f/html');
+    
+    $image = html_writer::empty_tag('img', array('src'=>$pix, 'class'=>'icon'));
     
     $filelinkstr = html_writer::tag('span', $url, array('id'=>$submissionid.'_'.$count.'_linkstr'));
     $url_text = $image;

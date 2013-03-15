@@ -84,7 +84,8 @@ if (!assessment_user_can_view_post($post, $course, $cm, $assessment, $discussion
     print_error('cannotviewpost', 'assessment', "$CFG->wwwroot/mod/assessment/view.php?id=$cm->id");
 }
 
-$PAGE->set_pagelayout('base');
+//$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('popup');
 $PAGE->navbar->add(get_string('discussionlist', 'assessment'), new moodle_url("discusslist.php?a=$assessment->id"));
 $PAGE->navbar->add($discussion->name);
 $PAGE->set_title($discussion->name);

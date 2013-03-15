@@ -1409,7 +1409,7 @@ class assessment_base {
                     $params = array(1, $assessment->id, $usertograde->id);
                     $select = "SELECT u.id,
                                    ags.id, ags.groupid, ags.marker, 
-                                   ags.grade, ags.type, ags.timemodified, ags.comment";
+                                   ags.grade, ags.type, ags.timemodified, ags.comment ";
                     $sql = "FROM {user} u 
                             LEFT JOIN {assessment_grades} ags ON u.id = ags.userid
                             AND ags.type = ? AND ags.assessmentid =  
@@ -1419,7 +1419,7 @@ class assessment_base {
                     if ($workmode == 'group') {
                         $select = "SELECT g.id,
                                        ags.id, ags.groupid, ags.marker, 
-                                       ags.grade, ags.type, ags.timemodified, ags.comment ";
+                                       ags.grade, ags.type, ags.timemodified, ags.comment";
                         $sql = "FROM {groups} g 
                                 LEFT JOIN {assessment_grades} ags ON g.id = ags.groupid
                                 AND ags.type = ? AND ags.assessmentid =  
@@ -2905,7 +2905,7 @@ class assessment_base {
         echo html_writer::end_tag('tr');
         
         // row 3
-        file_rewrite_pluginfile_urls($submission->description, 'pluginfile.php', $this->context->id, 'mod_assessment', 'submission_description', $submission->id);
+        $submission->description = file_rewrite_pluginfile_urls($submission->description, 'pluginfile.php', $this->context->id, 'mod_assessment', 'submission_description', $submission->id);
         
         echo html_writer::start_tag('tr');
         echo html_writer::tag('td', $submission->description, array('colspan'=>'2'));

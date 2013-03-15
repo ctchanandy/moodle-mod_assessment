@@ -246,7 +246,7 @@ if (!isset($coursecontext)) {
 if (!$cm = get_coursemodule_from_instance('assessment', $assessment->id, $course->id)) { // For the logs
     print_error('invalidcoursemodule');
 }
-$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+//$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
 
 require_login($course->id, false, $cm);
 
@@ -339,7 +339,7 @@ if ($fromform = $mform_post->get_data()) {
 
 $cm = get_coursemodule_from_instance("assessment", $assessment->id, $course->id);
 
-$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+//$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
 
 if ($post->discussionid) {
     if (! $toppost = $DB->get_record("assessment_posts", array('discussionid'=>$post->discussionid, 'parent'=>0), "parent, subject")) {
@@ -364,7 +364,7 @@ if (empty($discussion->name)) {
 $strdiscussionname = format_string($discussion->name).':';
 
 $PAGE->set_context($modcontext);
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('assessmentpost');
 
 $PAGE->navbar->add(get_string('discussionlist', 'assessment'), new moodle_url("discusslist.php?a=$assessment->id"));
 if ($post->parent) {
