@@ -1346,8 +1346,8 @@ class assessment_base {
                     $type = 0;
                     $params = array(0, $assessment->id, $usertograde->id);
                     $select = "SELECT u.id,
-                                   agt.id, agt.groupid, agt.marker, 
-                                   agt.grade, agt.type, agt.timemodified, agt.comment";
+                                   agt.id AS gid, agt.groupid, agt.marker, 
+                                   agt.grade, agt.type, agt.timemodified, agt.comment ";
                     $sql = "FROM {user} u 
                             LEFT JOIN {assessment_grades} agt ON u.id = agt.userid
                             AND agt.type = ? AND agt.assessmentid =  
@@ -1356,8 +1356,8 @@ class assessment_base {
                     /*************************************************/
                     if ($workmode == 'group') {
                         $select = "SELECT g.id,
-                                       agt.id, agt.groupid, agt.marker, 
-                                       agt.grade, agt.type, agt.timemodified, agt.comment";
+                                       agt.id AS gid, agt.groupid, agt.marker, 
+                                       agt.grade, agt.type, agt.timemodified, agt.comment ";
                         $sql = "FROM {groups} g 
                                 LEFT JOIN {assessment_grades} agt ON g.id = agt.groupid
                                 AND agt.type = ? AND agt.assessmentid =  
@@ -1389,7 +1389,8 @@ class assessment_base {
                         }
                         
                         echo "<tr><th>".get_string('comment', 'assessment').": </th>";
-                        echo "<td>".($teacherassessment->comment == '' ? '<em>'.get_string('nocomment', 'assessment').'</em>' : format_text(stripslashes($teacherassessment->comment), FORMAT_HTML))."</td></tr>";
+                        $teacher_comment = file_rewrite_pluginfile_urls($teacherassessment->comment, 'pluginfile.php', $this->context->id, 'mod_assessment', 'grade_comment', $teacherassessment->gid);
+                        echo "<td>".($teacher_comment == '' ? '<em>'.get_string('nocomment', 'assessment').'</em>' : $teacher_comment)."</td></tr>";
                     }
                 }
                 echo '</table>';
@@ -1419,7 +1420,7 @@ class assessment_base {
                     if ($workmode == 'group') {
                         $select = "SELECT g.id,
                                        ags.id, ags.groupid, ags.marker, 
-                                       ags.grade, ags.type, ags.timemodified, ags.comment";
+                                       ags.grade, ags.type, ags.timemodified, ags.comment ";
                         $sql = "FROM {groups} g 
                                 LEFT JOIN {assessment_grades} ags ON g.id = ags.groupid
                                 AND ags.type = ? AND ags.assessmentid =  
@@ -3531,38 +3532,64 @@ function assessment_pluginfile($course, $cm, $context, $filearea, $args, $forced
 
     require_course_login($course, true, $cm);
 
-    $fileareas = array('submission');
+    $fileareas = array('submission', 'submission_description', 'grade_comment', 'rubric_description', 'message');
     if (!in_array($filearea, $fileareas)) {
         return false;
     }
-
-    $submissionid = (int)array_shift($args);
-
-    if (!$submission = $DB->get_record('assessment_submissions', array('id'=>$submissionid))) {
-        return false;
-    }
-
+    
     if (!$assessment = $DB->get_record('assessment', array('id'=>$cm->instance))) {
         return false;
+    }
+    
+    if ($filearea == 'submission' || $filearea == 'submission_description') {
+        $submissionid = (int)array_shift($args);
+        if (!$submission = $DB->get_record('assessment_submissions', array('id'=>$submissionid))) {
+            return false;
+        }
+        $itemid = $submissionid;
+        
+        // Make sure groups allow this user to see this file
+        if ($submission->groupid > 0 and $groupmode = groups_get_activity_groupmode($cm, $course)) {   // Groups are being used
+            if (!groups_group_exists($submission->groupid)) { // Can't find group
+                return false;                           // Be safe and don't send it to anyone
+            }
+
+            if (!groups_is_member($submission->groupid) and !has_capability('moodle/site:accessallgroups', $context)) {
+                // do not send submission from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
+                return false;
+            }
+        }
+    }
+    
+    if ($filearea == 'grade_comment') {
+        $gradeid = (int)array_shift($args);
+        if (!$grade = $DB->get_record('assessment_grades', array('id'=>$gradeid))) {
+            return false;
+        }
+        $itemid = $gradeid;
+    }
+    
+    if ($filearea == 'rubric_description') {
+        $rubricid = (int)array_shift($args);
+        if (!$rubric = $DB->get_record('assessment_rubrics', array('id'=>$rubricid))) {
+            return false;
+        }
+        $itemid = $rubricid;
+    }
+    
+    if ($filearea == 'message') {
+        $postid = (int)array_shift($args);
+        if (!$rubric = $DB->get_record('assessment_posts', array('id'=>$postid))) {
+            return false;
+        }
+        $itemid = $postid;
     }
 
     $fs = get_file_storage();
     $relativepath = implode('/', $args);
-    $fullpath = "/$context->id/mod_assessment/$filearea/$submissionid/$relativepath";
+    $fullpath = "/$context->id/mod_assessment/$filearea/$itemid/$relativepath";
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
         return false;
-    }
-
-    // Make sure groups allow this user to see this file
-    if ($submission->groupid > 0 and $groupmode = groups_get_activity_groupmode($cm, $course)) {   // Groups are being used
-        if (!groups_group_exists($submission->groupid)) { // Can't find group
-            return false;                           // Be safe and don't send it to anyone
-        }
-
-        if (!groups_is_member($submission->groupid) and !has_capability('moodle/site:accessallgroups', $context)) {
-            // do not send submission from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
-            return false;
-        }
     }
 
     // finally send the file
