@@ -23,7 +23,7 @@ function setNext() {
     }
     self.location = 'assessment_grades.php?id='+document.getElementById('submitform').id.value+
                     param+
-                    '&offset='+document.getElementById('submitform').offset.value+
+                    '&offset='+(parseInt(document.getElementById('submitform').offset.value)+1)+
                     '&markergroupid='+document.getElementById('submitform').markergroupid.value+
                     '&type='+document.getElementById('submitform').type.value+
                     '&mode=single';
@@ -36,6 +36,7 @@ function saveNext() {
     } else {
         document.getElementById('submitform').userid.value = assessment.nextid;
     }
+    document.getElementById('submitform').offset.value = parseInt(document.getElementById('submitform').offset.value)+1;
     document.getElementById('submitform').saveuserid.value = assessment.usertograde;
     document.getElementById('submitform').menuindex.value = document.getElementById('submitform').grade.selectedIndex;
 }
