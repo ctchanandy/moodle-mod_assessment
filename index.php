@@ -38,7 +38,13 @@ if (! $course = $DB->get_record("course", array("id"=>$id))) {
 require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 
-add_to_log($course->id, "assessment", "view all", "index.php?id=$course->id", $course->fullname);
+$params = array(
+    'context' => context_course::instance($id)
+);
+$event = \mod_assessment\event\course_module_instances_list_viewed::create($params);
+$event->add_record_snapshot('course', $course);
+$event->trigger();
+//add_to_log($course->id, "assessment", "view all", "index.php?id=$course->id", $course->fullname);
 
 /// Get all required stringsassessment
 $strassessments = get_string("modulenameplural", "assessment");

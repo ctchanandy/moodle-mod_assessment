@@ -1,5 +1,5 @@
 <?php
-
+$string['assessment:addinstance'] = 'Add an assessment instance';
 $string['assessment'] = 'Assessment';
 $string['modulename'] = 'Assessment';
 $string['modulenameplural'] = 'Assessments';
@@ -300,4 +300,24 @@ $string['errorincorrectcmid'] = 'Course Module ID was incorrect.';
 $string['errornouseridgroupid'] = 'No userid or groupid is provided.';
 $string['errornopeerassessment'] = 'No peer assessment found.';
 
-?>
+// event names
+$string['eventdiscussiondeleted'] = 'A discussion has been deleted.';
+$string['eventdiscussionviewed'] = 'A discussion has been viewed.';
+$string['eventdiscussionlistviewed'] = 'A discussion list has been viewed.';
+$string['eventgradestudentviewed'] = 'An assessment of a student (or group) has been viewed.';
+$string['eventsubmissionadded'] = 'A submission of a student (or group) has been added.';
+$string['eventsubmissionformviewed'] = 'A submission form of a student (or group) has been viewed.';
+$string['eventsubmissionupdated'] = 'A submission of a student (or group) has been updated.';
+$string['eventsubmissionviewed'] = 'A submission of a student (or group) has been viewed.';
+$string['eventteachergradeadded'] = 'A teacher assessment of a student (or group) has been added.';
+$string['eventselfgradeadded'] = 'A self assessment of a student (or group) has been added.';
+$string['eventpeergradeadded'] = 'A peer assessment of a student (or group) has been added.';
+$string['eventteachergradeupdated'] = 'A teacher assessment of a student (or group) has been updated.';
+$string['eventselfgradeupdated'] = 'A self assessment of a student (or group) has been updated.';
+$string['eventpeergradeupdated'] = 'A peer assessment of a student (or group) has been updated.';
+$string['eventpostadded'] = 'A post has been added.';
+$string['eventpostdeleted'] = 'A post has been deleted.';
+$string['eventpostupdated'] = 'A post has been updated.';
+$string['eventrubriccreated'] = 'A rubric has been created.';
+$string['eventrubricdeleted'] = 'A rubric has been deleted.';
+$string['eventrubricupdated'] = 'A rubric has been updated.';

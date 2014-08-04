@@ -62,8 +62,8 @@ if (!empty($reply)) {      // User is writing a new reply
         print_error('invalidcoursemodule');
     }
 
-    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-    $modcontext    = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $coursecontext = context_course::instance($course->id);
+    $modcontext    = context_module::instance($cm->id);
 
     if (! assessment_user_can_post($assessment, $discussion, $USER, $cm, $course, $modcontext)) {
         if (has_capability('moodle/legacy:guest', $coursecontext, NULL, false)) {  // User is a guest here!
@@ -126,7 +126,7 @@ if (!empty($reply)) {      // User is writing a new reply
     if (!$cm = get_coursemodule_from_instance("assessment", $assessment->id, $course->id)) {
         print_error('invalidcoursemodule');
     } else {
-        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $modcontext = context_module::instance($cm->id);
     }
     if (!$post->parent) {
         if ((time() - $post->timecreated) > $CFG->maxeditingtime) {
@@ -181,13 +181,30 @@ if (!empty($reply)) {      // User is writing a new reply
         } else {
             if (!$post->parent) {  // post is a discussion topic as well, so delete discussion
                 assessment_delete_discussion($discussion);
-                add_to_log($assessment->course, "assessment", "delete discussion",
-                           "view.php?id=$cm->id", "$assessment->id", $cm->id);
+                
+                $event = \mod_assessment\event\discussion_deleted::create(array(
+                    'objectid' => $cm->id,
+                    'courseid' => $course->id,
+                    'context' => context_module::instance($cm->id)
+                ));
+                $event->add_record_snapshot('assessment_discussions', $discussion);
+                $event->add_record_snapshot('assessment_posts', $post);
+                $event->trigger();
+                //add_to_log($assessment->course, "assessment", "delete discussion", "view.php?id=$cm->id", "$assessment->id", $cm->id);
                 redirect("view.php?id=$cm->id");
 
             } else if (assessment_delete_post($post, has_capability('mod/assessment:deleteanypost', $modcontext))) {
                 $discussionurl = "discuss.php?d=$post->discussionid";
-                add_to_log($assessment->course, "assessment", "delete post", $discussionurl, "$post->id", $cm->id);
+                
+                $event = \mod_assessment\event\post_deleted::create(array(
+                    'objectid' => $post->id,
+                    'courseid' => $course->id,
+                    'context' => context_module::instance($cm->id),
+                    'other' => array('discussionid'=>$post->discussionid)
+                ));
+                $event->add_record_snapshot('assessment_posts', $post);
+                $event->trigger();
+                //add_to_log($assessment->course, "assessment", "delete post", $discussionurl, "$post->id", $cm->id);
                 redirect(assessment_go_back_to($discussionurl));
             } else {
                 print_error('errordeletingpost', 'assessment', '', $post->id);
@@ -240,7 +257,7 @@ if (!empty($reply)) {      // User is writing a new reply
 
 if (!isset($coursecontext)) {
     // Has not yet been set by post.php.
-    $coursecontext = get_context_instance(CONTEXT_COURSE, $assessment->course);
+    $coursecontext = context_course::instance($assessment->course);
 }
 
 if (!$cm = get_coursemodule_from_instance('assessment', $assessment->id, $course->id)) { // For the logs
@@ -298,8 +315,15 @@ if ($fromform = $mform_post->get_data()) {
         
         $discussionurl = "discuss.php?d=$discussion->id#p$fromform->id";
         
-        add_to_log($course->id, "assessment", "update post",
-                "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
+        $event = \mod_assessment\event\post_updated::create(array(
+            'objectid' => $fromform->id,
+            'courseid' => $course->id,
+            'context' => context_module::instance($cm->id),
+            'other' => array('discussionid'=>$discussion->id)
+        ));
+        $event->add_record_snapshot('assessment_posts', $updatepost);
+        $event->trigger();
+        //add_to_log($course->id, "assessment", "update post", "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
         
         redirect(assessment_go_back_to("$discussionurl"), $message, $timemessage);
         
@@ -320,7 +344,15 @@ if ($fromform = $mform_post->get_data()) {
 
             $discussionurl = "discuss.php?d=$discussion->id";
             
-            add_to_log($course->id, "assessment", "add post", "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
+            $event = \mod_assessment\event\post_added::create(array(
+                'objectid' => $fromform->id,
+                'courseid' => $course->id,
+                'context' => context_module::instance($cm->id),
+                'other' => array('discussionid'=>$discussion->id)
+            ));
+            $event->add_record_snapshot('assessment_posts', $addpost);
+            $event->trigger();
+            //add_to_log($course->id, "assessment", "add post", "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
 
             redirect(assessment_go_back_to("$discussionurl#p$fromform->id"), $message, $timemessage);
 
@@ -400,7 +432,7 @@ if (!empty($parent)) {
 } else {
     $assessment->intro = trim($assessment->intro);
     if (!empty($assessment->intro)) {
-        print_box(format_text($assessment->intro), 'generalbox', 'intro');
+        $OUTPUT->box(format_text($assessment->intro), 'generalbox', 'intro');
     }
     $heading = get_string('yournewtopic', 'forum');
 }

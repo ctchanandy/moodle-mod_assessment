@@ -435,3 +435,45 @@ ol.peersummary li div {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
+/* Speech bubble for peer assessment comment */
+.peercommentbubble {
+    position:relative;
+    width:600px;
+    padding:15px 25px 20px;
+    margin:10px auto;
+    font: 14px/1.2 Georgia, serif;
+    color:#000;
+    background:#ecf3fa;
+}
+
+.peercommentbubble:after {
+    content:"";
+    position:absolute;
+    top:100%;
+    right:25px;
+    border-width:30px 30px 0 0;
+    border-style:solid;
+    border-color:#ecf3fa transparent;
+    /* css3 extras */
+    -webkit-transform:skewX(-15deg);
+       -moz-transform:skewX(-15deg);
+        -ms-transform:skewX(-15deg);
+         -o-transform:skewX(-15deg);
+            transform:skewX(-15deg);
+}
+
+.peercommentuser {
+    margin:1em 0 0;
+    font:14px/1.2 Arial, sans-serif;
+}
+
+.peercommentuser:before {
+    content:"— ";
+}
+
+.peercommentseparator {
+    margin: 1em 0;
+}
+
+blockquote, p {padding:0; margin:0;}

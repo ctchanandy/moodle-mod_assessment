@@ -39,7 +39,8 @@ if (! $course = $DB->get_record("course", array("id"=>$course))) {
     print_error('coursemisconf', 'assessment');
 }
 
-$context = get_context_instance(CONTEXT_COURSE, $course->id);
+//$context = get_context_instance(CONTEXT_COURSE, $course->id);
+$context = context_course::instance($course->id);
 require_capability('moodle/course:manageactivities', $context);
 
 $url = new moodle_url('/mod/assessment/rubric/mod.php');
@@ -82,7 +83,10 @@ switch($action){
 
         $rubric = new rubric($id);
         $rubric->get_specs();
-
+        
+        // get rubric object for logging
+        $rubric_obj = $DB->get_record('assessment_rubrics', array('id'=>$id));
+        
         if($course->id != $rubric->course->id){
             print_error('cidmismatchrid', 'assessment');
         }
@@ -123,7 +127,14 @@ switch($action){
             print_error('errordeleterubric', 'assessment', "{$CFG->wwwroot}/mod/assessment/rubric/index.php?id={$course->id}");
             $rubric->view_footer();
         } else { // success
-            add_to_log($course->id, "assessment", "delete rubric ($id)", "rubric/index.php?id={$course->id}", $rubric->name);
+            $event = \mod_assessment\event\rubric_deleted::create(array(
+                'objectid' => $id,
+                'courseid' => $course->id,
+                'context' => context_course::instance($course->id)
+            ));
+            $event->add_record_snapshot('assessment_rubrics', $rubric_obj);
+            $event->trigger();
+            //add_to_log($course->id, "assessment", "delete rubric ($id)", "rubric/index.php?id={$course->id}", $rubric->name);
             redirect("{$CFG->wwwroot}$return");
         }
         break;

@@ -43,7 +43,7 @@ class assessment_base {
     var $context;
     var $type;
     var $rubric;
-   
+    
     /**
     * Constructor
     */
@@ -63,7 +63,7 @@ class assessment_base {
             print_error('invalidcoursemodule');
         }
         
-        $this->context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+        $this->context = context_module::instance($this->cm->id);
         
         if ($course) {
             $this->course = $course;
@@ -115,7 +115,7 @@ class assessment_base {
 
         $this->rubric = new rubric($this->assessment->rubricid, $this->assessment);
       
-        if ($this->usehtmleditor = can_use_html_editor()) {
+        if ($this->usehtmleditor) {
             $this->defaultformat = FORMAT_HTML;
         } else {
             $this->defaultformat = FORMAT_MOODLE;
@@ -227,7 +227,7 @@ class assessment_base {
             }
         } else {
             /// Get all ppl that are allowed to submit assessment
-            $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+            $context = context_course::instance($COURSE->id);
             if ($users = get_users_by_capability($context, 'mod/assessment:submit', 'u.id', '', '', '', '', '', false)) {
                 $users = array_keys($users);
             } else {
@@ -325,7 +325,7 @@ class assessment_base {
         // now get rid of all files
         $fs = get_file_storage();
         if ($cm = get_coursemodule_from_instance('assessment', $assessment->id)) {
-            $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+            $context = context_module::instance($cm->id);
             $fs->delete_area_files($context->id);
         }
     }
@@ -453,12 +453,10 @@ class assessment_base {
         $context = $this->context;
         require_capability('mod/assessment:view', $context);
         
-        add_to_log($course->id, "assessment", "view overview page", "view.php?id={$cm->id}",$assessment->name, $cm->id);
-        
         $PAGE->requires->js_init_call('initRubricStr', array(get_string('hiderubric', 'assessment'), get_string('showrubric', 'assessment')));
         $this->view_header();
         
-        $course_context = get_context_instance(CONTEXT_COURSE, $course->id);
+        $course_context = context_course::instance($course->id);
         if (has_capability('gradereport/grader:view', $course_context) && has_capability('moodle/grade:viewall', $course_context)) {
             echo '<div class="allcoursegrades"><a href="view_gradebook.php?id=' . $course->id . '">'
                 . get_string('seeallcoursegrades', 'grades') . '</a></div>';
@@ -618,7 +616,7 @@ class assessment_base {
                 }
             }
             
-            // 2Calculate final grade on the fly with SQL,
+            // Calculate final grade on the fly with SQL,
             // to deal with sort by final grade, and replace old method of getting final grade
             $finalgradesort = array();
             $finalgradesortsql = '';
@@ -647,7 +645,8 @@ class assessment_base {
                 $where .= ' '.$this->get_sql_filter_teacher_view($filter, $assessment->id);
             
             // Get Teacher and Self assessment first, return user name even there is no assessment
-            $select = "SELECT u.id, u.firstname, u.lastname, ".$peersortsql."
+            $more_names = "u.lastnamephonetic, u.firstnamephonetic, u.middlename, u.alternatename, ";
+            $select = "SELECT u.id, u.firstname, u.lastname, $more_names $peersortsql
                        (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"chiname\")) as chiname,
                        (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"class\")) as class,
                        (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"classno\")) as classno,
@@ -806,7 +805,7 @@ class assessment_base {
                
                     //// Individual assess group: need to display list of student instead of group
                     if ($assessment->peergroupmode == 1) {
-                        $select = "SELECT u.id, u.firstname, u.lastname, ".$peersortsql."
+                        $select = "SELECT u.id, u.firstname, u.lastname, $more_names $peersortsql
                                     (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"chiname\")) as chiname,
                                     (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"class\")) as class,
                                     (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \"classno\")) as classno,
@@ -1506,7 +1505,8 @@ class assessment_base {
                     $query_params = array('shortname1'=>'chiname', 'shortname2'=>'class', 'u_id'=>$usertograde->id);
                     list($in_sql, $in_params) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
                     $params = array_merge($in_params, $query_params);
-                    $sql = "SELECT u.id, u.firstname, u.lastname,
+                    $more_names = "u.lastnamephonetic, u.firstnamephonetic, u.middlename, u.alternatename, ";
+                    $sql = "SELECT u.id, u.firstname, u.lastname, $more_names
                             (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \":shortname1\")) as chiname, 
                             (SELECT data FROM {user_info_data} WHERE userid = u.id AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = \":shortname2\")) as class 
                             FROM {user} as u WHERE u.id $in_sql ";
@@ -1809,7 +1809,7 @@ class assessment_base {
         }
         
         $sql = "SELECT $fields_sql, id from {assessment_discussions} 
-                WHERE assessmentid = :assessmentid AND ".$workmode."id $in_sql";
+                WHERE assessmentid = :assessmentid AND ".$workmode."id $in_sql LIMIT 1";
         
         if (!$discussionids = $DB->get_records_sql($sql, $params)) {
             foreach ($id_arr as $id) {
@@ -2456,6 +2456,29 @@ class assessment_base {
             print_error('errornouser', 'assessment');
         }
         
+        if ($workmode == 'group') {
+            if ($type == 0 || ($type == 2 && $peergroupmode == 1)) {
+                $markername = fullname($marker);
+                $username = $usertograde->name;
+            } else if ($type == 1 || ($type == 2 && $peergroupmode == 2)) {
+                $markername = $marker->name;
+                $username = $usertograde->name;
+            }
+        } else {
+            $markername = fullname($marker);
+            $username = fullname($usertograde);
+            // Self assessment but not the marker
+            if ($type == 1 && $marker->id!=$usertograde->id) {
+                $rubric_display_mode = 'view';
+            } else {
+                // Peer assessment and view own submission
+                if ($type == 2 && $usertograde->id == $USER->id) {
+                    $rubric_display_mode = 'view';
+                }
+            }
+        }
+        
+        /*
         if (($type == 1 || ($type == 2 && $peergroupmode == 2)) && $workmode == 'group') {
             $markername = $marker->name;
             $username = $usertograde->name;
@@ -2467,7 +2490,7 @@ class assessment_base {
             $username = fullname($usertograde);
             $rubric_display_mode = ($type == 1 && $marker->id!=$usertograde->id) ? 'view' : 'edit';
         }
-        
+        */
         $submission = $this->get_submission($usertograde->id);
         if (!$assessment_grade = $this->get_assessment_grade($marker->id, $usertograde->id, $type)) {
             // prevent peer assessment if maximum no. of peer graded is reached
@@ -2563,9 +2586,24 @@ class assessment_base {
             $nextid = $nextuser->id;
         }
         
+        $log_others = array($workmode.'id'=>$usertograde->id);
+        $log_others['offset'] = $offset;
+        $log_others['type'] = $type;
+        $log_others['peergroupmode'] = ($type == 2) ? $peergroupmode : '';
+        $event = \mod_assessment\event\grade_student_viewed::create(array(
+            'objectid' => $cm->id,
+            'courseid' => $course->id,
+            'context' => context_module::instance($cm->id),
+            'other' => $log_others
+        ));
+        $event->add_record_snapshot('assessment_grades', $assessment_grade);
+        $event->trigger();
+        
+        /*
         $log_url = 'assessment_grades.php?id='.$cm->id.'&'.$workmode.'id='.$usertograde->id.'&mode=single&offset='.$offset.'&type='.$type;
         if ($type == 2) $log_url .= '&peergroupmode='.$peergroupmode;
         add_to_log($course->id, "assessment", "view grade student", $log_url, $assessmentidname.': '.$username, $cm->id);
+        */
         
         $style = "<style type=\"text/css\">
                       body {margin: 0px;}
@@ -2662,7 +2700,7 @@ class assessment_base {
         } else {
             $teacher = $USER;
         }
-      
+        
         $mformdata = new stdClass();
         $mformdata->context = $this->context;
         $mformdata->offset = $offset;
@@ -2763,16 +2801,25 @@ class assessment_base {
             echo $OUTPUT->header();
             echo $OUTPUT->box_start();
             if (sizeof($auser_peer_marked) > 0) {
-                echo '<ol class="peersummary">';
+                //echo '<ol class="peersummary">';
                 foreach ($auser_peer_marked as $gradeid => $gradeobj) {
                     $linktograde = $this->display_grade($gradeobj->grade, 1).', '.userdate($gradeobj->timemodified);
                     if ($this->rubric->id) {
-                        echo '<li>'.$gradeobj->peername.' - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->workid.'\', this, \'title\')" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        //echo '<li>'.$gradeobj->peername.' - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->workid.'\', this, \'title\')" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        echo '<div class="peercommentbubble">';
+                        echo '<blockquote><p>';
+                        echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML));
+                        echo '</p></blockquote>';
+                        echo '<p class="peercommentuser">';
+                        echo '<strong>'.$gradeobj->peername.'</strong> - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->workid.'\', this, \'title\')" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        echo '</p>';
+                        echo '</div>';
                     } else {
                         echo '<li>'.$gradeobj->peername.' - '.$linktograde;
                     }
-                    echo '<div><strong>'.get_string('comment', 'assessment').'</strong>: ';
-                    echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML)).'</div>';
+                    echo '<div class="peercommentseparator">&nbsp;</div>';
+                    //echo '<div><strong>'.get_string('comment', 'assessment').'</strong>: ';
+                    //echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML)).'</div>';
                     if ($this->rubric->id) {
                         echo '<div id="peerrubric'.$gradeobj->workid.'" style="display:none;z-index:100;">';
                         $this->rubric->grade($assessment, $gradeobj, $gradeobj->workid, 2, 'student', 'teacherview', $gradeobj->marker);
@@ -2780,7 +2827,7 @@ class assessment_base {
                     }
                     echo '</li>';
                 }
-                echo '</ol>';
+                //echo '</ol>';
             }
             echo $OUTPUT->box_end();
         } else {
@@ -2825,12 +2872,21 @@ class assessment_base {
                 foreach ($auser_peer_markedby as $gradeid => $gradeobj) {
                     $linktograde = $this->display_grade($gradeobj->grade, 1).', '.userdate($gradeobj->timemodified);
                     if ($this->rubric->id) {
-                        echo '<li>'.$gradeobj->markername.' - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->marker.'\', this, \'title\'); return false" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        //echo '<li>'.$gradeobj->markername.' - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->marker.'\', this, \'title\'); return false" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        echo '<div class="peercommentbubble">';
+                        echo '<blockquote><p>';
+                        echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML));
+                        echo '</p></blockquote>';
+                        echo '<p class="peercommentuser">';
+                        echo '<strong>'.$gradeobj->markername.'</strong> - <a href="#" onclick="showhiderubric(\'peerrubric'.$gradeobj->marker.'\', this, \'title\')" title="'.get_string('showrubric', 'assessment').'">'.$linktograde.'</a>';
+                        echo '</p>';
+                        echo '</div>';
                     } else {
                         echo '<li>'.$gradeobj->markername.' - '.$linktograde;
                     }
-                    echo '<div><strong>'.get_string('comment', 'assessment').'</strong>: ';
-                    echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML)).'</div>';
+                    echo '<div class="peercommentseparator">&nbsp;</div>';
+                    //echo '<div><strong>'.get_string('comment', 'assessment').'</strong>: ';
+                    //echo (empty($gradeobj->comment)?'N/A':format_text(stripslashes($gradeobj->comment), FORMAT_HTML)).'</div>';
                     if ($this->rubric->id) {
                         echo '<div id="peerrubric'.$gradeobj->marker.'" style="display:none;z-index:100;">';
                         $this->rubric->grade($assessment, $gradeobj, $gradeobj->workid, 2, 'student', 'teacherview', $gradeobj->marker);
@@ -2875,7 +2931,16 @@ class assessment_base {
         $assessment = $this->assessment;
         $submission = $this->get_submission($id);
         
-        add_to_log($this->course->id, "assessment", "view submission", 'view_submission.php?id='.$this->cm->id.'&a='.$assessment->id.'&'.$workmode.'id='.$work->id, $workname, $this->cm->id);
+        $log_others = array($workmode.'id'=>$work->id, 'assessmentid'=>$assessment->id);
+        $event = \mod_assessment\event\submission_viewed::create(array(
+            'objectid' => $submission->id,
+            'courseid' => $course->id,
+            'context' => context_module::instance($cm->id),
+            'other' => $log_others
+        ));
+        $event->add_record_snapshot('assessment_submissions', $submission);
+        $event->trigger();
+        //add_to_log($this->course->id, "assessment", "view submission", 'view_submission.php?id='.$this->cm->id.'&a='.$assessment->id.'&'.$workmode.'id='.$work->id, $workname, $this->cm->id);
         
         print "<style type=\"text/css\">
                    body {min-width: 700px;}
@@ -3022,6 +3087,28 @@ class assessment_base {
                 return false;
             }
             
+            $log_others = array($workmode.'id'=>$feedback->userid);
+            $log_others['markergroupid'] = $markerid;
+            $log_others['type'] = $type;
+            $event_array = array(
+                'objectid' => $this->assessment->id,
+                'courseid' => $this->course->id,
+                'context' => context_module::instance($this->cm->id),
+                'other' => $log_others
+            );
+            if ($type == 0) {
+                if ($log_action == 'add') $event = \mod_assessment\event\teacher_grade_added::create($event_array);
+                if ($log_action == 'update') $event = \mod_assessment\event\teacher_grade_updated::create($event_array);
+            } else if ($type == 1) {
+                if ($log_action == 'add') $event = \mod_assessment\event\self_grade_added::create($event_array);
+                if ($log_action == 'update') $event = \mod_assessment\event\self_grade_updated::create($event_array);
+            } else if ($type == 2) {
+                if ($log_action == 'add') $event = \mod_assessment\event\peer_grade_added::create($event_array);
+                if ($log_action == 'update') $event = \mod_assessment\event\peer_grade_updated::create($event_array);
+            }
+            $event->add_record_snapshot('assessment_grades', $assessment_grade);
+            $event->trigger();
+            /*
             // get user/group for add_to_log
             if ($workmode == 'user') {
                $user = $DB->get_record('user', array('id'=>$workerid));
@@ -3039,6 +3126,7 @@ class assessment_base {
                         $workmode.'id='.$feedback->userid.'&'.
                         '&mode=single&type='.$type;
             add_to_log($this->course->id, 'assessment', $log_message, $log_url, $name, $this->cm->id);
+            */
         }
         return $assessment_grade;
     }
@@ -3070,7 +3158,7 @@ class assessment_base {
 class mod_assessment_grading_form extends moodleform {
 
     function definition() {
-        global $OUTPUT;
+        global $OUTPUT, $USER;
         $mform =& $this->_form;
         
         $formattr = $mform->getAttributes();
@@ -3134,7 +3222,7 @@ class mod_assessment_grading_form extends moodleform {
                 $mform->addElement('static', 'comment', get_string('comment', 'assessment'), $comment);
             }
         } else if ($this->_customdata->type == 1 || $this->_customdata->type == 2) {
-            if ($this->_customdata->viewer == 'teacher' || $this->_customdata->rubric_display_mode == 'teacherview') {
+            if ($this->_customdata->viewer == 'teacher' || $this->_customdata->rubric_display_mode == 'teacherview' || $this->_customdata->markerid != $USER->id) {
                 $comment = trim($this->_customdata->assessment_grade->comment) == '' ? 'N/A': format_text($this->_customdata->comment, FORMAT_HTML);
                 $mform->addElement('static', 'comment', get_string('comment', 'assessment'), $comment);
             } else {

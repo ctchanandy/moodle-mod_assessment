@@ -62,12 +62,22 @@ $PAGE->set_pagelayout('incourse');
 
 require_course_login($course, true, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 $PAGE->set_context($context);
 
 /// Print the page header
 $strassessments = get_string("modulenameplural", "assessment");
 $strassessment  = get_string("modulename", "assessment");
+
+$eventdata = array();
+$eventdata['objectid'] = $assessment->id;
+$eventdata['context'] = $context;
+
+$event = \mod_assessment\event\course_module_viewed::create($eventdata);
+$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('course', $course);
+$event->trigger();
+//add_to_log($course->id, "assessment", "view overview page", "view.php?id={$cm->id}",$assessment->name, $cm->id);
 
 /// Print the main part of the page
 $assessmentinstance = new assessment_base($cm->id, $assessment, $cm, $course);

@@ -68,7 +68,7 @@ if ($id) {
 }
 
 require_login($course->id, false, $cm);
-require_capability('mod/assessment:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
+require_capability('mod/assessment:grade', context_module::instance($cm->id));
 
 $url = new moodle_url('/mod/assessment/view_submission.php');
 $url->param('id', $id);

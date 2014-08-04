@@ -55,7 +55,7 @@ if (! $course = $DB->get_record("course", array("id"=>$course))) {
 
 require_login($course->id);
 
-$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+$coursecontext = context_course::instance($course->id);
 
 $url = new moodle_url('/mod/assessment/rubric/edit.php');
 $url->param('submitmode', $submitmode);
@@ -100,7 +100,7 @@ if($copyrubric){
 
 $existform->name = isset($_POST['name']) ? $_POST['name']:$rubric->name;
 
-$existform->description = isset($_POST['description']) ? $_POST['description']:$rubric->description;
+$existform->description = isset($_POST['description']) ? $_POST['description']['text']:$rubric->description;
 
 $draftid_editor = file_get_submitted_draft_itemid('rubric_description');
 $currenttext = file_prepare_draft_area($draftid_editor, $coursecontext->id, 'mod_assessment', 'rubric_description', empty($rubricid) ? null : $rubricid, array('subdirs'=>0), empty($existform->description) ? '' : $existform->description);
@@ -375,86 +375,103 @@ if ($reform->is_cancelled()) {
     $error = $rubric->validate($_POST);
     
     if(!$error->error){
-       $rubric->name = $fromform->name;
-       $rubric->itemid = $fromform->description['itemid'];
-       $rubric->description = $fromform->description['text'];
-       $rubric->rowcoldefine = $fromform->rowcoldefine;
-       $rubric->points = $totalpoints;
+        $rubric->name = $fromform->name;
+        $rubric->itemid = $fromform->description['itemid'];
+        $rubric->description = $fromform->description['text'];
+        $rubric->rowcoldefine = $fromform->rowcoldefine;
+        $rubric->points = $totalpoints;
        
-       if(!$rubric->commit()) {
-           echo '<br />';
-           print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
-       }
+        if(!$rubric->commit()) {
+            echo '<br />';
+            print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
+        }
        
-       $rubric->description = file_save_draft_area_files($rubric->itemid, $coursecontext->id, 'mod_assessment', 'rubric_description', $rubric->id, array('subdirs'=>0), $rubric->description);
+        $rubric->description = file_save_draft_area_files($rubric->itemid, $coursecontext->id, 'mod_assessment', 'rubric_description', $rubric->id, array('subdirs'=>0), $rubric->description);
+        
+        // insert criteria name and order
+        $rubric->rowspecs = array();
+        for($i=1; $i<$dimension_row+1; $i++) {
+            $rowspec = new object;
+            $rowspec->id = $i-1;
+            $rowspec->rubricid = $rubric->id;
+            $rowspec->displayorder = $i;
+            $rowspec->name = $_POST['rowname_'.$i];
+            $rowspec->custompoint = isset($_POST['custompoint_'.$i]) ? $_POST['custompoint_'.$i] : 0;
+            $rubric->add_rowspec($rowspec);
+        }
        
-       // insert criteria name and order
-       $rubric->rowspecs = array();
-       for($i=1; $i<$dimension_row+1; $i++) {
-           $rowspec = new object;
-           $rowspec->id = $i-1;
-           $rowspec->rubricid = $rubric->id;
-           $rowspec->displayorder = $i;
-           $rowspec->name = $_POST['rowname_'.$i];
-           $rowspec->custompoint = isset($_POST['custompoint_'.$i]) ? $_POST['custompoint_'.$i] : 0;
-           $rubric->add_rowspec($rowspec);
-       }
+        // insert level name, order and weight
+        $rubric->colspecs = array();
+        for($j=1; $j<$dimension_col+1; $j++) {
+            $colspec = new object;
+            $colspec->id = $j-1;
+            $colspec->rubricid = $rubric->id;
+            $colspec->displayorder = $j;
+            $colspec->name = $_POST['colname_'.$j];
+            $colspec->points = $_POST['colweight_'.$j];
+            if (isset($_POST['colmaxweight_'.$j]))
+                $colspec->maxpoints = $_POST['colmaxweight_'.$j];
+            else
+                $colspec->maxpoints = 0;
+            $rubric->add_colspec($colspec);
+        }
        
-       // insert level name, order and weight
-       $rubric->colspecs = array();
-       for($j=1; $j<$dimension_col+1; $j++) {
-           $colspec = new object;
-           $colspec->id = $j-1;
-           $colspec->rubricid = $rubric->id;
-           $colspec->displayorder = $j;
-           $colspec->name = $_POST['colname_'.$j];
-           $colspec->points = $_POST['colweight_'.$j];
-           if (isset($_POST['colmaxweight_'.$j]))
-              $colspec->maxpoints = $_POST['colmaxweight_'.$j];
-           else
-              $colspec->maxpoints = 0;
-           $rubric->add_colspec($colspec);
-       }
-       
-       if(!$rubric->commit()){
-           echo '<br />';
-           print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
-       }
-       
-       $rubric->allspecid = implode(',', array_keys($rubric->specs));
-       $rubric->specs = array();
-       for($i=1; $i<$dimension_row+1; $i++) {
-           for($j=1; $j<$dimension_col+1; $j++) {
-               $spec = new object;
-               $spec->id = ($i-1)*$dimension_col+($j-1);
-               $spec->rubricrowid = $rubric->rowspec_map[$i];
-               $spec->rubriccolid = $rubric->colspec_map[$j];
-               $spec->description = $_POST['rbdescription_'.$i.'_'.$j];
-               $spec->points = isset($_POST['points_'.$i.'_'.$j]) ? $_POST['points_'.$i.'_'.$j] : '0';
-               $spec->maxpoints = isset($_POST['maxpoints_'.$i.'_'.$j]) ? $_POST['maxpoints_'.$i.'_'.$j] : '0';
-               $rubric->add_spec($spec);
-           }
-       }
-       
-       // recalculate total points
-       $rubric->computePoints();
-       $rubric->_orig_points = 0;
-       
-       if($rubric->commit()){
-           if($updatewnd){
-               print "Success.<br />";
-               if ($rubricid != 0)
-                  $rubric->update_form_rubric('update');
-               else
-                  $rubric->update_form_rubric('create');
-               close_window();
-               die;
-           }
-           redirect($CFG->wwwroot.$return);
-       }else{
-           echo '<br />';
-           print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
-       }
+        if(!$rubric->commit()){
+            echo '<br />';
+            print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
+        }
+        
+        $rubric->allspecid = implode(',', array_keys($rubric->specs));
+        $rubric->specs = array();
+        for($i=1; $i<$dimension_row+1; $i++) {
+            for($j=1; $j<$dimension_col+1; $j++) {
+                $spec = new object;
+                $spec->id = ($i-1)*$dimension_col+($j-1);
+                $spec->rubricrowid = $rubric->rowspec_map[$i];
+                $spec->rubriccolid = $rubric->colspec_map[$j];
+                $spec->description = $_POST['rbdescription_'.$i.'_'.$j];
+                $spec->points = isset($_POST['points_'.$i.'_'.$j]) ? $_POST['points_'.$i.'_'.$j] : '0';
+                $spec->maxpoints = isset($_POST['maxpoints_'.$i.'_'.$j]) ? $_POST['maxpoints_'.$i.'_'.$j] : '0';
+                $rubric->add_spec($spec);
+            }
+        }
+        
+        // recalculate total points
+        $rubric->computePoints();
+        $rubric->_orig_points = 0;
+        
+        if($rubric->commit()){
+            if($updatewnd){
+                print "Success.<br />";
+                // get rubric object for logging
+                $rubric_obj = $DB->get_record('assessment_rubrics', array('id'=>$rubric->id));
+                if ($rubricid != 0) {
+                    $rubric->update_form_rubric('update');
+                    // log rubric updated
+                    $event = \mod_assessment\event\rubric_updated::create(array(
+                        'objectid' => $rubric->id,
+                        'courseid' => $course->id,
+                        'context' => context_course::instance($course->id)
+                    ));
+                } else {
+                    $rubric->update_form_rubric('create');
+                    // log rubric created
+                    $event = \mod_assessment\event\rubric_created::create(array(
+                        'objectid' => $rubric->id,
+                        'courseid' => $course->id,
+                        'context' => context_course::instance($course->id)
+                    ));
+                }
+                $event->add_record_snapshot('assessment_rubrics', $rubric_obj);
+                $event->trigger();
+                close_window();
+                die;
+            }
+            redirect($CFG->wwwroot.$return);
+        } else {
+            echo '<br />';
+            print_error('errorcreaterubric', 'assessment', $CFG->wwwroot.$return);
+        }
     }
 }
 

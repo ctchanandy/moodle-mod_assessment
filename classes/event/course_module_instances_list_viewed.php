@@ -1,5 +1,5 @@
 <?php
-// This file is part of Assessment module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,12 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The mod_assessment instance list viewed event.
+ *
+ * @package    mod_assessment
+ * @copyright  2014 Andy Chan
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace mod_assessment\event;
 defined('MOODLE_INTERNAL') || die();
 
-$module->version   = 2014073101;       // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2011112900;       // Requires this Moodle version
-$module->component = 'mod_assessment'; // Full name of the plugin (used for diagnostics)
-$module->cron      = 0;
-
-$module->displayversion = 'Unstable development version';
-$module->maturity  = MATURITY_ALPHA;
+/**
+ * The mod_assessment instance list viewed event class.
+ *
+ * @package    mod_assessment
+ * @since      Moodle 2.7
+ * @copyright  2014 Andy Chan
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+}

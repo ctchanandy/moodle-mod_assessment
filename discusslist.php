@@ -49,14 +49,22 @@ require_course_login($course, true, $cm);
 // move this down fix for MDL-6926
 require_once('locallib.php');
 
-$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+$modcontext = context_module::instance($cm->id);
 if (!has_capability('mod/assessment:viewdiscussion', $modcontext)) {
     notice(get_string('noviewdiscussionspermission', 'assessment'));
 }
 
+$event = \mod_assessment\event\discussion_list_viewed::create(array(
+    'objectid' => $assessment->id,
+    'courseid' => $course->id,
+    'context' => context_module::instance($cm->id)
+));
+$event->add_record_snapshot('assessment', $assessment);
+$event->trigger();
+/*
 $logparameters = "a=$assessment->id";
-
 add_to_log($course->id, 'assessment', 'view discussion list', "discusslist.php?$logparameters", $assessment->id, $cm->id);
+*/
 
 $PAGE->set_pagelayout('base');
 $PAGE->navbar->add(get_string('discussionlist', 'assessment'));

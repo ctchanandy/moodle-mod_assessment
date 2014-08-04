@@ -5,7 +5,7 @@ var ru = document.getElementById('id_rubricid');
 
 // Allows Rubric & Points select dropdown's to interact
 function updateElem(value, courseid, wwwpath, sesskey) {
-    var ob = document.getElementById('id_grade'); // old 'points' grading dropdown
+    var ob = document.getElementById('id_modgrade_type'); // old 'points' grading dropdown
     var i = ru.selectedIndex;
     var l = ru.options.length - 2;
 
@@ -17,10 +17,10 @@ function updateElem(value, courseid, wwwpath, sesskey) {
     
     if (value == 'import') {
         ru.selectedIndex = 0;
-        window.open(wwwpath + '/mod/assessment/rubric/mod.php?course=' + courseid + '&action=popuplistview&sesskey=' + sesskey, 'import', 'location=1,status=1,scrollbars=1,width=1000,height=600');
+        window.open(wwwpath + '/mod/assessment/rubric/mod.php?course=' + courseid + '&action=popuplistview&sesskey=' + sesskey, 'import', 'location=1,status=1,scrollbars=1,width=1024,height=640');
     } else if (value == 'new') {
         ru.selectedIndex = 0;
-        window.open(wwwpath + '/mod/assessment/rubric/mod.php?course=' + courseid + '&action=popupcreate&sesskey=' + sesskey, 'new', 'location=1,status=1,scrollbars=1,width=1000,height=600');
+        window.open(wwwpath + '/mod/assessment/rubric/mod.php?course=' + courseid + '&action=popupcreate&sesskey=' + sesskey, 'new', 'location=1,status=1,scrollbars=1,width=1024,height=640');
     }
 }
 

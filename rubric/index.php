@@ -37,7 +37,7 @@ if (! $course = $DB->get_record("course", array("id"=>$id))) {
 
 require_course_login($course);
 
-$context = get_context_instance(CONTEXT_COURSE, $id);
+$context = context_course::instance($id);
 require_capability('mod/assessment:teachergrade', $context);
 
 $url = new moodle_url('/mod/assessment/rubric/index.php');
@@ -57,14 +57,14 @@ $PAGE->navbar->add($strassessments, new moodle_url($CFG->wwwroot."/mod/assessmen
 if(!empty($rubricid)){
     // display a specific rubric
     $rubric = new rubric($rubricid);
-    add_to_log($course->id, "assessment", "view rubric (id=$rubricid)", "rubric/index.php?id=$course->id&rubric=$rubricid", $rubric->name);
+    //add_to_log($course->id, "assessment", "view rubric (id=$rubricid)", "rubric/index.php?id=$course->id&rubric=$rubricid", $rubric->name);
     
     $PAGE->set_title("$strassessments - $strrubrics");
     echo $OUTPUT->header();
     $rubric->view();
 } else {
     // display all rubrics in a course
-    add_to_log($course->id, "assessment", "view all rubrics", "rubric/index.php?id=$course->id", $course->fullname);
+    //add_to_log($course->id, "assessment", "view all rubrics", "rubric/index.php?id=$course->id", $course->fullname);
     
     $strrubric = get_string("rubric", "assessment");
     $strusedby = get_string("usedby", "assessment");

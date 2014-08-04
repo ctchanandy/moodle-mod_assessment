@@ -62,11 +62,25 @@ $PAGE->set_url($url);
 // move this down fix for MDL-6926
 require_once('locallib.php');
 
-$modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+$modcontext = context_module::instance($cm->id);
 $PAGE->set_context($modcontext);
 
 require_capability('mod/assessment:viewdiscussion', $modcontext, NULL, true, 'noviewdiscussionspermission', 'assessment');
 
+$event = \mod_assessment\event\discussion_viewed::create(array(
+    'objectid' => $discussion->id,
+    'courseid' => $course->id,
+    'context' => context_module::instance($cm->id),
+    'other' => array("parent"=>$parent)
+));
+$event->add_record_snapshot('assessment_discussions', $discussion);
+$event->trigger();
+
+if (!$parent) {
+    $parent = $discussion->firstpost;
+}
+
+/*
 $logparameters = "d=$discussion->id";
 if ($parent) {
     $logparameters .= "&amp;parent=$parent";
@@ -75,6 +89,7 @@ if ($parent) {
 }
 
 add_to_log($course->id, 'assessment', 'view discussion', "discuss.php?$logparameters", $discussion->id, $cm->id);
+*/
 
 if (! $post = assessment_get_post_full($parent)) {
     print_error('discussionnotexist', 'assessment', "$CFG->wwwroot/mod/assessment/view.php?id=$cm->id");

@@ -174,7 +174,7 @@ function assessment_count_graded($assessment, $type=0) {
     if ($type == 0) $assessmentid = $DB->get_field('assessment_types', 'id', array('assessmentid'=>$assessment->id, 'type'=>$type));
     
     $cm = get_coursemodule_from_instance('assessment', $assessment->id);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     
     // this is all the users with this capability set, in this context or higher
     if ($users = get_users_by_capability($context, 'mod/assessment:submit', '', '', '', '', 0, '', false)) {
@@ -195,7 +195,7 @@ function assessment_count_graded($assessment, $type=0) {
 function print_assessment_user_submitted_files_simple($submission, $assessment, $cm, $edit=0, $type='html') {
     global $OUTPUT;
     
-    if (!$context = get_context_instance(CONTEXT_MODULE, $cm->id)) {
+    if (!$context = context_module::instance($cm->id)) {
         return get_string('error');
     }
     
@@ -228,7 +228,7 @@ function print_assessment_user_submitted_files_simple($submission, $assessment, 
 function print_assessment_user_submitted_files($submission, $assessment, $cm) {
     global $OUTPUT;
     
-    if (!$context = get_context_instance(CONTEXT_MODULE, $cm->id)) {
+    if (!$context = context_module::instance($cm->id)) {
         return get_string('error');
     }
     
@@ -510,7 +510,7 @@ function assessment_user_can_post($assessment, $discussion, $user=NULL, $cm=NULL
     }
     
     if (!$context) {
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
     }
     
     // normal users with temporary guest access can not post
@@ -558,7 +558,7 @@ function assessment_print_discussion($course, $cm, $assessment, $discussion, $po
         $ownpost = false;
     }
     if ($canreply === NULL) {
-        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $modcontext = context_module::instance($cm->id);
         $reply = assessment_user_can_post($assessment, $discussion, $USER, $cm, $course, $modcontext);
     } else {
         $reply = $canreply;
@@ -610,7 +610,7 @@ function assessment_print_post($post, $discussion, $assessment, &$cm, $course, $
     // String cache
     static $str;
     
-    $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $modcontext = context_module::instance($cm->id);
     
     $post->course = $course->id;
     $post->assessmentid = $assessment->id;
@@ -629,7 +629,8 @@ function assessment_print_post($post, $discussion, $assessment, &$cm, $course, $
     }
 
     if (!isset($cm->uservisible)) {
-        $cm->uservisible = coursemodule_visible_for_user($cm);
+        $cm->uservisible = \core_availability\info_module::is_user_visible($cm, 0, false);;
+        //$cm->uservisible = coursemodule_visible_for_user($cm);
     }
 
     if (!assessment_user_can_see_post($assessment, $discussion, $post, NULL, $cm)) {
@@ -685,6 +686,10 @@ function assessment_print_post($post, $discussion, $assessment, &$cm, $course, $
     $postuser->id        = $post->userid;
     $postuser->firstname = $post->firstname;
     $postuser->lastname  = $post->lastname;
+    $postuser->lastnamephonetic = $post->lastnamephonetic;
+    $postuser->firstnamephonetic = $post->firstnamephonetic;
+    $postuser->middlename = $post->middlename;
+    $postuser->alternatename = $post->alternatename;
     $postuser->email     = $post->email;
     $postuser->imagealt  = $post->imagealt;
     $postuser->picture   = $post->picture;
@@ -901,7 +906,8 @@ function assessment_get_all_discussion_posts($discussionid, $sort) {
     $tr_sel  = ", ar.id AS postread";
     $tr_join = "LEFT JOIN {assessment_read} ar ON (ar.postid = p.id AND ar.userid = ?)";
     
-    if (!$posts = $DB->get_records_sql($sql="SELECT p.*, u.firstname, u.lastname, u.email, u.picture, u.imagealt $tr_sel
+    $more_names = "u.lastnamephonetic, u.firstnamephonetic, u.middlename, u.alternatename,";
+    if (!$posts = $DB->get_records_sql($sql="SELECT p.*, u.firstname, u.lastname, $more_names u.email, u.picture, u.imagealt $tr_sel
                                         FROM {assessment_posts} p
                                             LEFT JOIN {user} u ON p.userid = u.id
                                             $tr_join
@@ -933,7 +939,8 @@ function assessment_get_post_full($postid) {
     global $DB;
     
     $params = array($postid);
-    $sql = "SELECT p.*, d.assessmentid, u.firstname, u.lastname, u.email, u.picture, u.imagealt
+    $more_names = "u.lastnamephonetic, u.firstnamephonetic, u.middlename, u.alternatename,";
+    $sql = "SELECT p.*, d.assessmentid, u.firstname, u.lastname, $more_names u.email, u.picture, u.imagealt
             FROM {assessment_posts} p
                 JOIN {assessment_discussions} d ON p.discussionid = d.id
                 LEFT JOIN {user} u ON p.userid = u.id
@@ -1149,7 +1156,7 @@ function assessment_user_can_see_post($assessment, $discussion, $post, $user=NUL
             return false;
         }
     } else {
-        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $modcontext = context_module::instance($cm->id);
         if (!has_capability('mod/assessment:viewdiscussion', $modcontext, $user->id)) {
             return false;
         }
@@ -1175,7 +1182,7 @@ function assessment_user_can_view_post($post, $course, $cm, $assessment, $discus
         $user = $USER;
     }
 
-    $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $modcontext = context_module::instance($cm->id);
     if (!has_capability('mod/assessment:viewdiscussion', $modcontext)) {
         return false;
     }
@@ -1200,7 +1207,7 @@ function assessment_get_discussions($cm, $forumsort="d.timemodified DESC", $page
     $modcontext = null;
     $now = round(time(), -2);
 
-    $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $modcontext = context_module::instance($cm->id);
 
     if (!has_capability('mod/assessment:viewdiscussion', $modcontext)) { /// User must have perms to view discussions
         return array();
@@ -1214,7 +1221,7 @@ function assessment_get_discussions($cm, $forumsort="d.timemodified DESC", $page
 
     if ($groupmode) {
         if (empty($modcontext)) {
-            $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+            $modcontext = context_module::instance($cm->id);
         }
 
         if ($groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $modcontext)) {
@@ -1243,9 +1250,10 @@ function assessment_get_discussions($cm, $forumsort="d.timemodified DESC", $page
 
     $umfields = "";
     $umtable  = "";
-
+    
+    $more_names = "u.lastnamephonetic, u.firstnamephonetic, u.middlename, u.alternatename,";
     $sql = "SELECT $postdata, d.name, d.timemodified, d.groupid,
-                u.firstname, u.lastname, u.email, u.picture, u.imagealt $umfields
+                u.firstname, u.lastname, $more_names u.email, u.picture, u.imagealt $umfields
             FROM {assessment_discussions} d
                 JOIN {assessment_posts} p ON p.discussionid = d.id
                 JOIN {user} u ON p.userid = u.id
@@ -1311,7 +1319,7 @@ function assessment_get_discussions_unread($cm) {
     $currentgroup = groups_get_activity_group($cm);
 
     if ($groupmode) {
-        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $modcontext = context_module::instance($cm->id);
 
         if ($groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $modcontext)) {
             if ($currentgroup) {
@@ -1363,7 +1371,7 @@ function assessment_print_discussion_header(&$post, $assessment, $group=-1, $dat
         if (!$cm = get_coursemodule_from_instance('assessment', $assessment->id, $assessment->course)) {
             print_error('errorincorrectcmid', 'assessment');
         }
-        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $modcontext = context_module::instance($cm->id);
     }
 
     if (!isset($rowcount)) {
@@ -1388,6 +1396,10 @@ function assessment_print_discussion_header(&$post, $assessment, $group=-1, $dat
     $postuser->id = $post->userid;
     $postuser->firstname = $post->firstname;
     $postuser->lastname = $post->lastname;
+    $postuser->lastnamephonetic = $post->lastnamephonetic;
+    $postuser->firstnamephonetic = $post->firstnamephonetic;
+    $postuser->middlename = $post->middlename;
+    $postuser->alternatename = $post->alternatename;
     $postuser->email = $post->email;
     $postuser->imagealt = $post->imagealt;
     $postuser->picture = $post->picture;
@@ -1458,7 +1470,7 @@ function assessment_print_discussions($course, $assessment, $currentgroup=-1, $g
             print_error('errorincorrectcmid', 'assessment');
         }
     }
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
 
     $sort = "d.timemodified DESC";
 

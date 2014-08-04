@@ -61,9 +61,9 @@ if ($id) {
 $PAGE->set_url($url);
 
 require_login($course->id, false, $cm);
-require_capability('mod/assessment:teachergrade', get_context_instance(CONTEXT_MODULE, $cm->id));
+require_capability('mod/assessment:teachergrade', context_module::instance($cm->id));
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 if (!$assessment->numfiles) {
     print_error('notrequirefile', 'assessment');

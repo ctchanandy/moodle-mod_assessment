@@ -64,7 +64,7 @@ if ($userid) {
 
 require_login($course->id, false, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 if (!has_capability('mod/assessment:upload', $context)) {
     print_error('errorcannotviewcontent', 'assessment');
 }
@@ -141,7 +141,17 @@ if ($mform->is_cancelled()) {
             $transaction->rollback($e);
             //return false;
         }
-        add_to_log($course->id, "assessment", "update submission", "upload_form.php?id=".$cm->id."&userid=".$userid, $assessment->name, $cm->id);
+        
+        $log_others = array($workmode.'id'=>$workid, 'assessmentid'=>$assessment->id);
+        $event = \mod_assessment\event\submission_updated::create(array(
+            'objectid' => $newsubmission->id,
+            'courseid' => $course->id,
+            'context' => context_module::instance($cm->id),
+            'other' => $log_others
+        ));
+        $event->add_record_snapshot('assessment_submissions', $newsubmission);
+        $event->trigger();
+        //add_to_log($course->id, "assessment", "update submission", "upload_form.php?id=".$cm->id."&userid=".$userid, $assessment->name, $cm->id);
     } else {
         // insert the submission
         // Begin transaction
@@ -158,7 +168,16 @@ if ($mform->is_cancelled()) {
             //return false;
         }
         
-        add_to_log($course->id, "assessment", "add submission", "upload.php?id=".$cm->id."&userid=".$userid, $assessment->name, $cm->id);
+        $log_others = array($workmode.'id'=>$workid, 'assessmentid'=>$assessment->id);
+        $event = \mod_assessment\event\submission_added::create(array(
+            'objectid' => $newsubmission->id,
+            'courseid' => $course->id,
+            'context' => context_module::instance($cm->id),
+            'other' => $log_others
+        ));
+        $event->add_record_snapshot('assessment_submissions', $newsubmission);
+        $event->trigger();
+        //add_to_log($course->id, "assessment", "add submission", "upload.php?id=".$cm->id."&userid=".$userid, $assessment->name, $cm->id);
     }
 } else {
     // this branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
@@ -193,7 +212,16 @@ if ($mform->is_cancelled()) {
                                       'itemid'=>$draftid_editor);
     $mform->set_data($mformdata);
     
-    add_to_log($course->id, 'assessment', 'view submission form', 'upload.php?id='.$cm->id.'&'.$workmode.'id='.$workid, fullname($USER, true));
+    $log_others = array($workmode.'id'=>$workid, 'assessmentid'=>$assessment->id);
+    $event = \mod_assessment\event\submission_form_viewed::create(array(
+        'objectid' => $submission->id,
+        'courseid' => $course->id,
+        'context' => context_module::instance($cm->id),
+        'other' => $log_others
+    ));
+    $event->add_record_snapshot('assessment_submissions', $submission);
+    $event->trigger();
+    //add_to_log($course->id, 'assessment', 'view submission form', 'upload.php?id='.$cm->id.'&'.$workmode.'id='.$workid, fullname($USER, true));
     
     echo $OUTPUT->heading(get_string('updatesubmission', 'assessment'));
     echo $OUTPUT->box_start('generalbox assessmentuploadform');

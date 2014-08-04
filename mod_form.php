@@ -55,7 +55,7 @@ class mod_assessment_mod_form extends moodleform_mod {
         }
 		$mform->addRule('name', null, 'required', null, 'client');
         
-        $this->add_intro_editor(true, get_string('description', 'assignment'));
+        $this->add_intro_editor(true, get_string('assessmentintro', 'assessment'));
         
         // Build-in file submission detail
         $submissionfilesoptions = array();
@@ -168,6 +168,7 @@ class mod_assessment_mod_form extends moodleform_mod {
         } else {
             $mform->addElement('hidden', 'peergroupmode', 0);
         }
+        $mform->setType('peergroupmode', PARAM_INT);
         
         $mform->disabledIf('peerweight', 'peer', 'eq', '0');
         $mform->disabledIf('peerstart', 'peer', 'eq', '0');
