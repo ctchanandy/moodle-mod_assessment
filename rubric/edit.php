@@ -391,7 +391,7 @@ if ($reform->is_cancelled()) {
         // insert criteria name and order
         $rubric->rowspecs = array();
         for($i=1; $i<$dimension_row+1; $i++) {
-            $rowspec = new object;
+            $rowspec = new stdClass();
             $rowspec->id = $i-1;
             $rowspec->rubricid = $rubric->id;
             $rowspec->displayorder = $i;
@@ -403,7 +403,7 @@ if ($reform->is_cancelled()) {
         // insert level name, order and weight
         $rubric->colspecs = array();
         for($j=1; $j<$dimension_col+1; $j++) {
-            $colspec = new object;
+            $colspec = new stdClass();
             $colspec->id = $j-1;
             $colspec->rubricid = $rubric->id;
             $colspec->displayorder = $j;
@@ -425,7 +425,7 @@ if ($reform->is_cancelled()) {
         $rubric->specs = array();
         for($i=1; $i<$dimension_row+1; $i++) {
             for($j=1; $j<$dimension_col+1; $j++) {
-                $spec = new object;
+                $spec = new stdClass();
                 $spec->id = ($i-1)*$dimension_col+($j-1);
                 $spec->rubricrowid = $rubric->rowspec_map[$i];
                 $spec->rubriccolid = $rubric->colspec_map[$j];

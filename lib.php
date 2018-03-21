@@ -47,7 +47,7 @@ class assessment_base {
     /**
     * Constructor
     */
-    function assessment_base($cmid='staticonly', $assessment=NULL, $cm=NULL, $course=NULL) {
+    function __construct($cmid='staticonly', $assessment=NULL, $cm=NULL, $course=NULL) {
         global $COURSE, $DB;
         
         if ($cmid == 'staticonly') {
@@ -466,7 +466,7 @@ class assessment_base {
         
         $this->view_intro();
         
-        $perpage = 30;
+        $perpage = 100;
         $pageno = optional_param('page', 0, PARAM_INT);
         $width = 800;
         
@@ -1328,8 +1328,14 @@ class assessment_base {
                       if (userid == 0) return false;
                       document.getElementById("menupeertogradeselect").selectedIndex = 0;
                       
-                      window.open(wwwpath+"/mod/assessment/assessment_grades.php?id="+cmid+"&markergroupid="+usertograde+"&"+workmode+"id="+userid+"&mode=single&type=2&offset=0", 
-                          "grade"+userid, "menubar=0,location=0,scrollbars,resizable,width=1024,height=600");
+                      var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+                      if (!iOS) {
+                         var w = window.open(wwwpath+"/mod/assessment/assessment_grades.php?id="+cmid+"&markergroupid="+usertograde+"&"+workmode+"id="+userid+"&mode=single&type=2&offset=0", 
+                            "grade"+userid, "menubar=0,location=0,scrollbars,resizable,width=1024,height=600");
+                         return w?false:true;
+                      } else {
+                          document.location.href = wwwpath+"/mod/assessment/assessment_grades.php?id="+cmid+"&markergroupid="+usertograde+"&"+workmode+"id="+userid+"&mode=single&type=2&offset=0";
+                      }
                   }';
             echo '</script>';
             
@@ -1528,6 +1534,7 @@ class assessment_base {
                     $peerusers = $DB->get_records_sql($sql, $params);
                     $peeroptions = array();
                     if (!empty($peerusers)) {
+                        /*
                         foreach ($peerusers as $peerid => $peeruser) {
                             $symbol = in_array($peerid, $submissions) ? ' ***' : '';
                             if ($workmode=='group') {
@@ -1545,6 +1552,21 @@ class assessment_base {
                                               'onchange'=>'choosepeertograde("'.$CFG->wwwroot.'", this.options[this.selectedIndex].value, 
                                               "'.$workmode.'", '.$cm->id.', '.$usertograde->id.')')
                                       );
+                        */
+                        // 20141204: Use Bootstrap Dropdown instead of relying on select and window.open, so that it work in iPad Safari
+                        foreach ($peerusers as $peerid => $peeruser) {
+                            $symbol = in_array($peerid, $submissions) ? ' ***' : '';
+                            $peer_url = $CFG->wwwroot.'/mod/assessment/assessment_grades.php?id='.$cm->id.'&markergroupid='.$usertograde->id.'&'.$workmode.'id='.$peerid.'&mode=single&type=2&offset=0';
+                            if ($workmode=='group') {
+                                $peeroptions[$peerid] = html_writer::link($peer_url, $peeruser->name.$symbol, array('title' => $peeruser->name, 'target' => '_blank'));
+                            } else {
+                                $option_text = $peeruser->class != '' ? '['.$peeruser->class.'] '.fullname($peeruser) : fullname($peeruser);
+                                $peeroptions[$peerid] = html_writer::link($peer_url, $option_text.$symbol, array('title' => $option_text, 'target' => '_blank'));
+                            }
+                        }
+                        $peerlist = html_writer::alist($peeroptions, array('class' => 'dropdown-menu', 'style' => 'height:300px;overflow:scroll'));
+                        $peerselectlink = html_writer::link('#peerselect', get_string('choosepeertograde', 'assessment'), array('class' => 'dropdown-toggle', 'data-toggle' => 'dropdown'));
+                        $peerselect = html_writer::tag('div', $peerselectlink.$peerlist, array('class' => 'dropdown'));
                     } else {
                         $peerselect = 'N/A';
                     }
@@ -1620,7 +1642,7 @@ class assessment_base {
                 if ($workmode == 'group') {
                     $params = array(2, $usertograde->id, $markerid, $assessment->id);
                     $sql = "SELECT agp.id, agp.userid, agp.groupid, agp.marker, ";
-                    if ($assessment->pergroupmode = 1) {
+                    if ($assessment->peergroupmode == 1) {
                         $sql .= "(SELECT ".$selectfullname." from {user} WHERE id = agp.marker) AS markername,
                                  (SELECT data FROM {user_info_data} WHERE userid = agp.marker AND fieldid = (SELECT id FROM {user_info_field} WHERE shortname = 'chiname')) as chiname,";
                     } else {
@@ -1871,7 +1893,7 @@ class assessment_base {
             $forum = $DB->get_record('forum', array('id'=>$this->assessment->forum));
             foreach ($ausers_arr as $userid) {
                 $usertoadd = $DB->get_record('user', array('id'=>$userid));
-                $discussion = new object();
+                $discussion = new stdClass();
                 $discussion->course   = $forum->course;
                 $discussion->forum    = $forum->id;
                 $discussionintro      = get_string('discussionintro', 'assessment');
@@ -2322,7 +2344,7 @@ class assessment_base {
     function get_submission($id, $createnew=false, $teachermodified=false) {
         global $COURSE, $DB;
         $workmode = $this->assessment->workmode;
-        if ($workmode == 0 || $workmode == 'user') {
+        if ($workmode === 0 || $workmode == 'user') {
             $workmode = 'user';
         } else {
             $workmode = 'group';
@@ -2729,7 +2751,6 @@ class assessment_base {
         $submitform = new mod_assessment_grading_form(null, $mformdata);
         $submitform->set_data($mformdata);
         $submitform->display();
-        
         echo $OUTPUT->footer();
     }
     
@@ -2773,8 +2794,13 @@ class assessment_base {
             // get peer assessment grade (user as marker)
             $auser_peer_marked = array();
             if ($workmode == 'group') {
-                if ($assessment->peergroupmode == 1) $peermarkerid = $user->id;
-                else $peermarkerid = $group->id;
+                if ($assessment->peergroupmode == 1) {
+                    $peermarkerid = $user->id;
+                    $markername = fullname($user, true);
+                } else {
+                    $peermarkerid = $group->id;
+                    $markername = $group->name;
+                }
                 $params = array($peermarkerid, $group->id, $assessment->id);
                 $sql = "SELECT agp.id, agp.groupid AS workid, agp.marker, agp.userid, 
                             (SELECT name from {groups} WHERE id = agp.groupid) AS peername,
@@ -2782,7 +2808,6 @@ class assessment_base {
                         FROM {assessment_grades} agp
                         WHERE agp.type = 2 AND agp.marker = ? AND agp.groupid <> ? AND agp.assessmentid =  
                             (SELECT id FROM {assessment_types} WHERE type = 2 AND assessmentid = ?)";
-                $markername = $group->name;
             } else {
                 $params = array($user->id, $user->id, $assessment->id);
                 $sql = "SELECT
@@ -2911,6 +2936,7 @@ class assessment_base {
     function view_submission($id) {
         global $PAGE, $OUTPUT, $DB;
         
+        $cm = $this->cm;
         $workmode = $this->assessment->workmode ? 'group' : 'user';
         
         if ($workmode == 'user') {
@@ -3158,7 +3184,7 @@ class assessment_base {
 class mod_assessment_grading_form extends moodleform {
 
     function definition() {
-        global $OUTPUT, $USER;
+        global $DB, $OUTPUT, $USER;
         $mform =& $this->_form;
         
         $formattr = $mform->getAttributes();
@@ -3221,8 +3247,14 @@ class mod_assessment_grading_form extends moodleform {
                 $comment = trim($this->_customdata->assessment_grade->comment) == '' ? 'N/A': format_text($this->_customdata->comment, FORMAT_HTML);
                 $mform->addElement('static', 'comment', get_string('comment', 'assessment'), $comment);
             }
-        } else if ($this->_customdata->type == 1 || $this->_customdata->type == 2) {
-            if ($this->_customdata->viewer == 'teacher' || $this->_customdata->rubric_display_mode == 'teacherview' || $this->_customdata->markerid != $USER->id) {
+        } else if ($this->_customdata->type == 1 || $this->_customdata->type == 2) {            $peerassessment = $this->_customdata->rubric_obj->peerassessment;
+            if ($peerassessment->type == 2 && $peerassessment->peergroupmode == 2) {
+                // group assessment group
+                $ismarker = $DB->record_exists('groups_members', array("groupid"=>$this->_customdata->markerid, "userid"=>$USER->id));
+            } else {
+                $ismarker = ($this->_customdata->markerid == $USER->id);
+            }
+            if ($this->_customdata->viewer == 'teacher' || $this->_customdata->rubric_display_mode == 'teacherview' || !$ismarker) {
                 $comment = trim($this->_customdata->assessment_grade->comment) == '' ? 'N/A': format_text($this->_customdata->comment, FORMAT_HTML);
                 $mform->addElement('static', 'comment', get_string('comment', 'assessment'), $comment);
             } else {
@@ -3302,7 +3334,7 @@ function assessment_get_user_grades($assessment, $userid=0) {
     $gradearr = array();
     if (!empty($users_graded)) {
         for ($i=0; $i<sizeof($users_graded); $i++) {
-            $gradeobj = new object();
+            $gradeobj = new stdClass();
             $gradeobj->userid = $users_graded[$i];
             $gradeobj->rawgrade = assessment_calculate_user_final_grade($assessment, $users_graded[$i]);
             $gradeobj->feedback = '';
@@ -3641,10 +3673,12 @@ function assessment_pluginfile($course, $cm, $context, $filearea, $args, $forced
             if (!groups_group_exists($submission->groupid)) { // Can't find group
                 return false;                           // Be safe and don't send it to anyone
             }
-
-            if (!groups_is_member($submission->groupid) and !has_capability('moodle/site:accessallgroups', $context)) {
-                // do not send submission from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
-                return false;
+            
+            if (groups_get_activity_groupmode($cm) == 1) {
+                if (!groups_is_member($submission->groupid) and !has_capability('moodle/site:accessallgroups', $context)) {
+                    // do not send submission from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
+                    return false;
+                }
             }
         }
     }

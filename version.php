@@ -16,10 +16,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version   = 2014073101;       // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2011112900;       // Requires this Moodle version
-$module->component = 'mod_assessment'; // Full name of the plugin (used for diagnostics)
-$module->cron      = 0;
+$plugin->version   = 2018032100;       // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2011112900;       // Requires this Moodle version
+$plugin->component = 'mod_assessment'; // Full name of the plugin (used for diagnostics)
+$plugin->cron      = 0;
 
-$module->displayversion = 'Unstable development version';
-$module->maturity  = MATURITY_ALPHA;
+$plugin->release = 'Unstable development version';
+$plugin->maturity  = MATURITY_ALPHA;

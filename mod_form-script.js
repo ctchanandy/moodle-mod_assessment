@@ -9,10 +9,12 @@ function updateElem(value, courseid, wwwpath, sesskey) {
     var i = ru.selectedIndex;
     var l = ru.options.length - 2;
 
-    if (i < l && (!isNumeric(value) || value == 0)) {
-        ob.disabled = false;
-    } else {
-        ob.disabled = true;
+    if (ob !== null) {
+        if (i < l && (!isNumeric(value) || value == 0)) {
+            ob.disabled = false;
+        } else {
+            ob.disabled = true;
+        }
     }
     
     if (value == 'import') {

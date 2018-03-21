@@ -87,7 +87,7 @@ if (!empty($reply)) {      // User is writing a new reply
     }
 
     // Load up the $post variable.
-    $post = new object();
+    $post = new stdClass();
     $post->course      = $course->id;
     $post->assessment  = $assessment->id;
     $post->discussionid  = $parent->discussionid;
@@ -387,7 +387,7 @@ if (empty($post->edit)) {
 
 if (empty($discussion->name)) {
     if (empty($discussion)) {
-        $discussion = new object;
+        $discussion = new stdClass();
     }
     $discussion->name = $assessment->name;
 }

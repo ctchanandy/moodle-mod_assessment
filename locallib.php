@@ -140,9 +140,25 @@ function assessment_print_file($file, $sid, $context, $type='html', $edit=1) {
     $path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$context->id.'/mod_assessment/submission/'.$sid.'/'.$filename);
 
     if ($type == 'html') {
+        if (in_array($mimetype, array('image/gif', 'image/jpeg', 'image/png'))) {
+            // Image attachments don't get printed as links
+            $return .= html_writer::empty_tag('br');
+            $img = html_writer::empty_tag('img', array('src'=>$path, 'title'=>$filename, 'alt'=>$filename, 'style'=>'width:400px;'));
+            $return .= html_writer::link($path, $img);
+        } else if (in_array($mimetype, array('video/quicktime', 'video/mp4', 'video/x-ms-wmv', 'video/x-flv'))) {
+            $return .= html_writer::empty_tag('br');
+            $return .= html_writer::link($path, $iconimage).' ';
+            $return .= format_text(html_writer::link($path, s($filename)), FORMAT_HTML, array('context'=>$context));
+        } else {
+            $return .= html_writer::link($path, $iconimage).' ';
+            $return .= html_writer::link($path, s($filename));
+            $return .= html_writer::empty_tag('br');
+        }
+        /*
         $return .= html_writer::link($path, $iconimage).' ';
         $return .= html_writer::link($path, s($filename));
         $return .= html_writer::empty_tag('br');
+        */
     } else if ($type == 'icon') {
         $return .= ' '.html_writer::link($path, $iconimage);
     } else if ($type == 'text') {
@@ -161,7 +177,6 @@ function assessment_print_file($file, $sid, $context, $type='html', $edit=1) {
     
     if ($type !== 'separateimages') {
         return $return;
-
     } else {
         return array($return, $imagereturn);
     }
@@ -565,7 +580,7 @@ function assessment_print_discussion($course, $cm, $assessment, $discussion, $po
     }
 
     // $cm holds general cache for forum functions
-    $cm->cache = new object();
+    $cm->cache = new stdClass();
     $cm->cache->groups = groups_get_all_groups($course->id, 0, $cm->groupingid);
     $cm->cache->usersgroups = array();
 
@@ -1392,7 +1407,7 @@ function assessment_print_discussion_header(&$post, $assessment, $group=-1, $dat
     echo "</td>\n";
 
     // Picture
-    $postuser = new object;
+    $postuser = new stdClass();
     $postuser->id = $post->userid;
     $postuser->firstname = $post->firstname;
     $postuser->lastname = $post->lastname;
